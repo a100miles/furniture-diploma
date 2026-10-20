@@ -8,7 +8,7 @@
 > **Priorities** use MoSCoW: **M** = Must have (MVP), **S** = Should have, **C** = Could have. "Won't have" items are listed in Section 2.11.
 > **Acceptance criteria** describe how each requirement is verified; every Must requirement has a check that can be passed or failed. FR-01 to FR-09 and NFR-01 to NFR-06 are the core MVP requirements referenced by [evaluation-plan.md](evaluation-plan.md) and the design diagrams; higher IDs refine and extend them.
 >
-> **Assumed stack:** React + React Three Fiber frontend, Python FastAPI backend, PostgreSQL, REST/JSON API (justified in [technology-comparison.md](technology-comparison.md)).
+> **Stack:** React + React Three Fiber web client, Go core API, Python ML service, PostgreSQL + pgvector, Redis, MinIO, REST/JSON with OpenAPI (justified in [technology-comparison.md](technology-comparison.md)).
 
 ## 1. Users and Roles
 
@@ -71,10 +71,11 @@
 
 | ID | Requirement | Priority | Acceptance criteria |
 |---|---|---|---|
-| FR-28 | The system shall store furniture items with name, category, dimensions (W x D x H), price, style tags, colour, material, image and 3D model. | M | The schema contains all fields; the catalogue holds at least 100 items with all fields filled. |
+| FR-28 | The system shall store furniture items with name, category, dimensions (W x D x H), price, style tags, colour, material, image and 3D model. | M | The schema contains all fields; the catalogue holds at least 5 000 items from at least two stores with all mandatory fields filled (3D model or parametric model, see FR-57). |
 | FR-29 | The system shall allow an administrator to add, edit and remove catalogue items and upload 3D models. | M | An admin creates an item with a GLB model, edits its price and deletes it; a regular user receives HTTP 403 for the same operations. |
 | FR-30 | The system shall store per-item placement metadata (front clearance, wall-mounted or free-standing, related items). | M | Every item has placement metadata and the layout module reads it (unit test). |
-| FR-31 | The system shall import catalogue items from a CSV or JSON file. | C | Importing a 20-row file creates 20 items; rows with missing required fields are reported and skipped. |
+| FR-31 | The system shall collect catalogue items from several Kazakhstan online furniture stores (e.g. mebel.kz) and import CSV/JSON files, normalising dimensions, materials, colour and price into one schema. | M | Parsers for at least two stores load at least 5 000 items; parsers respect robots.txt and a configured request rate; rows with missing required fields are reported and skipped; dimensions are stored in centimetres. |
+| FR-57 | The system shall generate a simplified parametric 3D model from catalogue dimensions for items without a seller 3D model. | M | For 20 sampled items without a model, the generated model's bounding box matches catalogue W x D x H within 1 cm and the item can be placed like any other. |
 
 ### 2.6 AI furniture recommendation
 
@@ -154,6 +155,8 @@
 | NFR-08 | Layout generation shall be fast and show progress. | M | The first layout returns within 10 s for 15 items (95th percentile over the benchmark); a progress indicator is visible meanwhile. |
 | NFR-09 | Editing interactions shall feel immediate. | M | Collision feedback (FR-07) updates within 100 ms while dragging in a scene with 30 items. |
 | NFR-10 | The backend shall handle concurrent users. | S | A load test with 50 virtual users (Locust or k6) keeps NFR-02 within its limit with an error rate below 1%. |
+| NFR-35 | Catalogue search shall be fast on the full catalogue. | M | With at least 5 000 items, the 95th-percentile response time of the catalogue search endpoint is under 300 ms (k6 load test, 20 virtual users). |
+| NFR-36 | Recommendation quality shall exceed the baseline. | M | On the labelled evaluation set, nDCG@10 of the ML ranking is higher than that of the baseline "filter by category and price" (see [evaluation-plan.md](evaluation-plan.md)). |
 
 ### 3.3 Usability
 
@@ -193,16 +196,16 @@
 
 | ID | Requirement | Priority | Acceptance criteria |
 |---|---|---|---|
-| NFR-25 | Frontend, backend, recommendation and layout modules shall be separated behind documented interfaces. | M | Recommendation and layout are separate Python packages called only through defined functions or endpoints, and each can be unit-tested without the web server. |
+| NFR-25 | Web client, core API, ML service and layout module shall be separated behind documented interfaces. | M | Recommendation runs in the ML service and is called only through its API; the layout module is a separate package of the core API; each is unit-tested without the web server; if the ML service is down the core API falls back to baseline ranking. |
 | NFR-26 | New categories, styles and placement rules shall be addable without code changes. | S | A new style and a new relationship rule added via the admin panel or a config file take effect without redeploying code. |
 | NFR-27 | Code style shall be enforced automatically. | S | CI runs linters and formatters (e.g. Ruff, ESLint, Prettier) and fails on violations. |
-| NFR-28 | The REST API shall be documented. | S | FastAPI's generated OpenAPI specification is available at `/docs`. |
+| NFR-28 | The REST API shall be documented. | S | The OpenAPI specifications of the core API and the ML service are kept in the repository and served at `/docs`; contract tests pass for both services. |
 
 ### 3.8 Deployment and operations
 
 | ID | Requirement | Priority | Acceptance criteria |
 |---|---|---|---|
-| NFR-29 | The system shall run locally with one command. | M | On a clean machine with Docker, `docker compose up` starts frontend, backend and database, and the app opens in the browser. |
+| NFR-29 | The system shall run locally with one command. | M | On a clean machine with Docker, `docker compose up` starts the web client, core API, ML service, PostgreSQL, Redis and MinIO, and the app opens in the browser. |
 | NFR-30 | The system shall be publicly deployed for evaluation and defence. | M | The application is reachable at a public HTTPS URL during the evaluation period. |
 | NFR-31 | Server errors shall be logged. | S | Every HTTP 5xx response produces a log entry with timestamp, endpoint and stack trace. |
 
@@ -217,7 +220,7 @@
 ## 4. Constraints and Assumptions
 
 - The system runs in a desktop web browser; no installation is required.
-- The MVP catalogue is curated by the team and is not connected to real stock.
+- The catalogue is collected from public store websites and is not connected to real stock; prices are stored with the collection date.
 - Room geometry is a single floor-level polygon with vertical walls and a flat ceiling.
 - External AI services, if used, are accessed through an API whose cost stays within the team's budget.
 - Development follows the diploma schedule in [project-management.md](project-management.md).
@@ -234,7 +237,7 @@
 
 | Priority | Functional | Non-functional |
 |---|---|---|
-| Must | 27 | 20 |
+| Must | 29 | 22 |
 | Should | 18 | 13 |
-| Could | 11 | 1 |
-| **Total** | **56** | **34** |
+| Could | 10 | 1 |
+| **Total** | **57** | **36** |
