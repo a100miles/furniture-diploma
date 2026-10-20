@@ -1,6 +1,6 @@
 # Evidence of Relevance
 
-**Task:** DIP-4 · **Status:** protocol ready, interviews to be conducted and recorded before 24 October 2026
+**Task:** DIP-4 · **Owner:** Muzaffar Kapezov · **Status:** protocol ready, interviews to be conducted and recorded before 24 October 2026
 
 The committee requires 3–5 discussions with user representatives (or a substantive agreement with a real client) and asks whether **verified findings are distinguished from assumptions**. This document holds the protocol, the record of each discussion, and the resulting findings. Only the "Findings" section may be used as evidence in the proposal and requirements; anything not confirmed there stays in the assumption register.
 
@@ -21,11 +21,11 @@ The committee requires 3–5 discussions with user representatives (or a substan
 
 | # | Profile | Why | Recruited by | Status |
 |---|---------|-----|--------------|--------|
-| P1 | Student or young professional who recently furnished a rented flat | Core target user | Tamerlan | ☐ |
-| P2 | Family that bought furniture in the last 12 months | Core target user, higher budget | Sultanbek | ☐ |
-| P3 | Furniture store salesperson / showroom manager (Astana) | Seller perspective, real objections of buyers | Muzaffar | ☐ |
-| P4 | Interior designer (freelance or studio) | Expert view on layout rules and tools they use | Sultanbek | ☐ |
-| P5 | Online furniture shopper who returned an item because it did not fit (optional) | Direct evidence for H1 | Tamerlan | ☐ |
+| P1 | Student or young professional who recently furnished a rented flat | Core target user | Sultanbek | ☐ |
+| P2 | Family that bought furniture in the last 12 months | Core target user, higher budget | Muzaffar | ☐ |
+| P3 | Furniture store salesperson / showroom manager (Astana) | Seller perspective, real objections of buyers | Tamerlan | ☐ |
+| P4 | Interior designer (freelance or studio) | Expert view on layout rules and tools they use | Muzaffar | ☐ |
+| P5 | Online furniture shopper who returned an item because it did not fit (optional) | Direct evidence for H1 | Sultanbek | ☐ |
 
 If a furniture retailer agrees to provide catalog data or to pilot the tool, record it as a **client agreement** in §5 — this is stronger evidence than interviews.
 

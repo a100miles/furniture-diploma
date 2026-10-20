@@ -7,14 +7,14 @@
 This review answers three questions that shape the system design:
 
 1. **RQ1.** Which computational approaches exist for arranging furniture in a room automatically or semi-automatically?
-2. **RQ2.** Which approaches exist for recommending furniture to a user (by style, size, budget, compatibility)?
+2. **RQ2.** Which approaches exist for recommending furniture to a user (by style, size, budget, compatibility), including multimodal (image + text) search?
 3. **RQ3.** What is known about how consumers use 3D / AR visualisation when choosing furniture, and how such systems should be evaluated?
 
-**Search.** Google Scholar, ACM Digital Library, IEEE Xplore, CVF Open Access and arXiv were searched with the terms *furniture arrangement*, *indoor scene synthesis*, *layout optimization*, *furniture recommendation*, *visual compatibility*, *constraint-based recommender*, *augmented reality furniture retail*, *usability scale*. Vendor pages and technical documentation were used only for describing tools and standards, never as evidence of scientific claims.
+**Search.** Google Scholar, ACM Digital Library, IEEE Xplore, CVF Open Access and arXiv were searched with the terms *furniture arrangement*, *indoor scene synthesis*, *layout optimization*, *furniture recommendation*, *visual compatibility*, *constraint-based recommender*, *multimodal product search*, *CLIP retrieval*, *complementary product recommendation*, *approximate nearest neighbour*, *ranking evaluation*, *augmented reality furniture retail*, *usability scale*. Vendor pages and technical documentation were used only for describing tools and standards, never as evidence of scientific claims.
 
 **Inclusion criteria.** (a) Peer-reviewed or a widely used technical standard; (b) directly relevant to RQ1–RQ3; (c) the core body published 2021–2026 (the field moves fast since the arrival of transformer, diffusion and LLM methods), with foundational works kept where later work builds on them.
 
-**Result.** 21 sources are used: 19 scientific publications (18 numbered works plus the SUS paper T3; 9 of them from 2021 or later) and 2 technical sources (T1, T2). Sources are cited as [n] and listed in Section 6.
+**Result.** 25 sources are used: 23 scientific publications (22 numbered works plus the SUS paper T3; 10 of them from 2021 or later) and 2 technical sources (T1, T2). Sources are cited as [n] and listed in Section 6.
 
 ## 2. Structured analysis table
 
@@ -38,6 +38,10 @@ This review answers three questions that shape the system design:
 | 16 | Yang et al., *Holodeck: Language guided generation of 3D embodied AI environments* | 2024 | CVPR | GPT-4 proposes spatial relational constraints; a solver optimises the layout; assets from Objaverse | Text → full 3D scene | Human raters preferred it over procedural baselines for residential scenes | LLM cost and latency; asset quality varies | **Key design idea adopted**: LLM (optional) produces *constraints*, a deterministic solver places objects — keeps results valid |
 | 17 | Lin & Mu, *InstructScene: Instruction-driven 3D indoor scene synthesis with semantic graph prior* | 2024 | ICLR | Semantic graph prior + layout decoder conditioned on instructions | Instruction → graph → layout | Better controllability than direct object-distribution models | Research code; trained on 3D-FRONT | Confirms value of an explicit relation graph (see [6]) |
 | 18 | Tang et al., *DiffuScene: Denoising diffusion models for generative indoor scene synthesis* | 2024 | CVPR | Diffusion over unordered object sets, then shape retrieval | Noise/text → object set | More physically plausible and diverse scenes than ATISS on 3D-FRONT | Heavy training; offline only | State of the art reference for the evaluation baseline discussion |
+| 19 | Radford et al., *Learning transferable visual models from natural language supervision* (CLIP) | 2021 | ICML | Contrastive pre-training of image and text encoders on 400M image–text pairs | Image or text → shared embedding | Strong zero-shot transfer; images and text comparable in one vector space | Web-data biases; fine details and counting weak | **Directly adopted**: CLIP-family embeddings of product photos and descriptions for style similarity and text queries |
+| 20 | Kang et al., *Complete the Look: Scene-based complementary product recommendation* | 2019 | CVPR | CNN + attention measuring global and local compatibility between a scene and a product | Scene photo → compatible products | Scene context improves complementary recommendations, including interior-design images | Trained on Pinterest data; compatibility labels are implicit | Supports ranking by compatibility with *already chosen* furniture, not only by similarity |
+| 21 | Malkov & Yashunin, *Efficient and robust approximate nearest neighbor search using HNSW graphs* | 2020 | IEEE TPAMI 42(4) | Hierarchical proximity graphs for approximate k-NN search | Query vector → nearest vectors | Logarithmic search complexity, high recall | Memory overhead; approximate | HNSW index in pgvector keeps embedding search within the latency budget |
+| 22 | Järvelin & Kekäläinen, *Cumulated gain-based evaluation of IR techniques* | 2002 | ACM TOIS 20(4) | Graded-relevance ranking metrics (DCG, nDCG) | Ranked list + graded labels → score | Rewards relevant items near the top; standard for ranking evaluation | Needs graded relevance labels | nDCG@10 is the main recommendation metric in the evaluation plan |
 | T1 | Khronos Group, *glTF 2.0 Specification* | 2021 | Standard | Runtime 3D asset format | — | Compact, PBR materials, web-native | — | Furniture models are stored and delivered as glTF/GLB |
 | T2 | three.js documentation; pmndrs, *React Three Fiber documentation* | 2026 | Technical docs | WebGL scene graph; declarative React renderer for three.js | — | Mature ecosystem (controls, loaders, helpers) | WebGL performance limits on low-end devices | Frontend 3D engine (see technology comparison) |
 | T3 | Brooke, *SUS: A "quick and dirty" usability scale* | 1996 | Book chapter (foundational) | 10-item usability questionnaire | — | Industry standard; score 68 ≈ average | Measures perceived usability only | Instrument for NFR-03 in the evaluation plan |
@@ -62,7 +66,9 @@ Three generations of methods are visible:
 
 Collaborative filtering requires interaction history that a new system does not have (cold start) [8]. Constraint- and knowledge-based recommenders [9] fit furniture especially well because requirements are explicit and hard (the sofa must physically fit and cost less than the budget) and because they can explain each recommendation. Visual embeddings [4, 11] capture style similarity but similarity is not the same as compatibility, and they require labelled image data.
 
-**What the project takes from this.** v1 is a constraint-based recommender with weighted soft scoring (style, colour, size ratio to room, price), producing a human-readable explanation per item. A content-based embedding (pgvector) is planned as a second signal in a weighted hybrid [8] once the catalog has images.
+**Multimodal search.** Contrastive image–text models such as CLIP [19] map product photos and descriptions into one vector space, so a sofa can be found from a text request ("light sofa up to 2 m") or from the photo of an armchair the user has already chosen. Work on complementary recommendation [20] shows that what matters for furnishing is *compatibility* with items already in the scene, not only visual similarity. Approximate nearest-neighbour indexes (HNSW [21]) make such search fast enough for interactive use on catalogues of thousands of items. Ranking quality is measured with graded-relevance metrics such as nDCG [22].
+
+**What the project takes from this.** The prototype is a constraint-based recommender with weighted soft scoring (style, size ratio to room, price) and a human-readable explanation per item; it also serves as the rule-based reference. The ML service adds CLIP embeddings of images and descriptions (pgvector, HNSW index) as a second signal in a weighted hybrid [8], ranking candidates by room size, budget and compatibility with already chosen furniture. Both are compared with the baseline "filter by category and price" using Precision@K and nDCG@10 [22].
 
 ### 3.3 Visualisation and user evaluation (RQ3)
 
@@ -104,6 +110,10 @@ Studies of IKEA Place [13, 14] show that the main purchase barrier online is unc
 16. Yang, Y., Sun, F.-Y., Weihs, L., VanderBilt, E., Herrasti, A., Han, W., et al. (2024). Holodeck: Language guided generation of 3D embodied AI environments. In *Proc. IEEE/CVF CVPR*. arXiv:2312.09067
 17. Lin, C., & Mu, Y. (2024). InstructScene: Instruction-driven 3D indoor scene synthesis with semantic graph prior. In *Proc. ICLR 2024*. arXiv:2402.04717
 18. Tang, J., Nie, Y., Markhasin, L., Dai, A., Thies, J., & Nießner, M. (2024). DiffuScene: Denoising diffusion models for generative indoor scene synthesis. In *Proc. IEEE/CVF CVPR* (pp. 20507–20518). arXiv:2303.14207
+19. Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., et al. (2021). Learning transferable visual models from natural language supervision. In *Proc. 38th International Conference on Machine Learning (ICML)*, PMLR 139, 8748–8763. arXiv:2103.00020
+20. Kang, W.-C., Kim, E., Leskovec, J., Rosenberg, C., & McAuley, J. (2019). Complete the look: Scene-based complementary product recommendation. In *Proc. IEEE/CVF CVPR* (pp. 10532–10541).
+21. Malkov, Y. A., & Yashunin, D. A. (2020). Efficient and robust approximate nearest neighbor search using hierarchical navigable small world graphs. *IEEE Transactions on Pattern Analysis and Machine Intelligence, 42*(4), 824–836. https://doi.org/10.1109/TPAMI.2018.2889473
+22. Järvelin, K., & Kekäläinen, J. (2002). Cumulated gain-based evaluation of IR techniques. *ACM Transactions on Information Systems, 20*(4), 422–446.
 
 Technical sources:
 
@@ -111,4 +121,4 @@ Technical sources:
 - T2. three.js documentation, https://threejs.org/docs/ ; Poimandres, *React Three Fiber documentation*, https://r3f.docs.pmnd.rs/
 - T3. Brooke, J. (1996). SUS: A "quick and dirty" usability scale. In P. W. Jordan et al. (Eds.), *Usability Evaluation in Industry* (pp. 189–194). Taylor & Francis.
 
-> **Before submission:** each team member should open the papers they present and re-check page numbers and DOIs; reference details were verified against publisher/CVF/arXiv listings on 2026-10-20 but page ranges for [3–7] were not individually re-checked.
+> **Before submission:** each team member should open the papers they present and re-check page numbers and DOIs; reference details were verified against publisher/CVF/arXiv listings on 2026-10-20 but page ranges for [3–7] and the volume/pages of [21] were not individually re-checked.
