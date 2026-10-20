@@ -6,6 +6,8 @@ The committee checks whether the supervisor reviewed the *substance* of the work
 
 > Record only feedback the supervisor actually gave. Comments may also be left directly on pull requests (add the supervisor as a reviewer); copy the key ones here.
 
+Meetings are held **weekly** (in person or MS Teams): review of completed tasks, demo of results, agreement on next steps.
+
 ## How to use
 
 1. Before a meeting, list the deliverables to review (with links).
