@@ -1,0 +1,52 @@
+%% Component diagram (draft) - DIP-8
+flowchart TB
+    subgraph FE["Frontend · React + three.js (React Three Fiber) · browser"]
+        direction TB
+        UI["Room setup &amp; panels UI<br/><i>RoomForm, CatalogPanel,<br/>RecommendationPanel, CostSummary</i>"]
+        EDITOR["3D Room Editor<br/><i>Scene, camera controls,<br/>drag/rotate, highlight invalid</i>"]
+        STORE["Project state store<br/><i>room, placed items, selection</i>"]
+        CLIENT["API client<br/><i>typed fetch wrapper</i>"]
+        UI --> STORE
+        EDITOR <--> STORE
+        STORE --> CLIENT
+    end
+
+    subgraph BE["Backend · Python FastAPI"]
+        direction TB
+        API["REST API layer<br/><i>routers, Pydantic schemas,<br/>OpenAPI docs</i>"]
+        CAT["Catalog service"]
+        REC["Recommendation engine<br/><i>hard constraints + weighted scoring<br/>+ explanations</i>"]
+        LAY["Layout solver<br/><i>rule-based placement v1</i>"]
+        GEO["Geometry &amp; validation<br/><i>footprints, overlap, bounds,<br/>clearance</i>"]
+        PRJ["Project service<br/><i>save / load</i>"]
+        NL["NL constraint adapter<br/><i>(optional, later)</i>"]
+        REPO["Data access layer<br/><i>repositories</i>"]
+        API --> CAT
+        API --> REC
+        API --> LAY
+        API --> PRJ
+        API -.-> NL
+        REC --> CAT
+        REC --> GEO
+        LAY --> GEO
+        CAT --> REPO
+        PRJ --> REPO
+    end
+
+    DB[("PostgreSQL<br/><i>catalog, projects;<br/>pgvector (later)</i>")]
+    FILES[("Static / object storage<br/><i>GLB models, thumbnails</i>")]
+    LLMX["LLM API (external, optional)"]
+
+    CLIENT -- "REST / JSON over HTTPS" --> API
+    EDITOR -- "GET .glb" --> FILES
+    REPO --> DB
+    NL -.-> LLMX
+
+    classDef fe fill:#e8f1fb,stroke:#1168bd,color:#111
+    classDef be fill:#eaf7ee,stroke:#2e8b57,color:#111
+    classDef store fill:#fff6e0,stroke:#c9a227,color:#111
+    classDef opt fill:#f3f3f3,stroke:#999,color:#555,stroke-dasharray: 4 3
+    class UI,EDITOR,STORE,CLIENT fe
+    class API,CAT,REC,LAY,GEO,PRJ,REPO be
+    class DB,FILES store
+    class NL,LLMX opt

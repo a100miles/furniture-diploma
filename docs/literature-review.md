@@ -1,0 +1,114 @@
+# Literature Review
+
+**Task:** DIP-5 · **Status:** draft for pre-defense 1 (24 October 2026)
+
+## 1. Purpose and method
+
+This review answers three questions that shape the system design:
+
+1. **RQ1.** Which computational approaches exist for arranging furniture in a room automatically or semi-automatically?
+2. **RQ2.** Which approaches exist for recommending furniture to a user (by style, size, budget, compatibility)?
+3. **RQ3.** What is known about how consumers use 3D / AR visualisation when choosing furniture, and how such systems should be evaluated?
+
+**Search.** Google Scholar, ACM Digital Library, IEEE Xplore, CVF Open Access and arXiv were searched with the terms *furniture arrangement*, *indoor scene synthesis*, *layout optimization*, *furniture recommendation*, *visual compatibility*, *constraint-based recommender*, *augmented reality furniture retail*, *usability scale*. Vendor pages and technical documentation were used only for describing tools and standards, never as evidence of scientific claims.
+
+**Inclusion criteria.** (a) Peer-reviewed or a widely used technical standard; (b) directly relevant to RQ1–RQ3; (c) the core body published 2021–2026 (the field moves fast since the arrival of transformer, diffusion and LLM methods), with foundational works kept where later work builds on them.
+
+**Result.** 21 sources are used: 19 scientific publications (18 numbered works plus the SUS paper T3; 9 of them from 2021 or later) and 2 technical sources (T1, T2). Sources are cited as [n] and listed in Section 6.
+
+## 2. Structured analysis table
+
+| # | Source | Year | Type | Approach | Input → Output | Key findings | Limitations | Relevance to our project |
+|---|--------|------|------|----------|----------------|--------------|-------------|--------------------------|
+| 1 | Merrell et al., *Interactive furniture layout using interior design guidelines* | 2011 | ACM TOG (SIGGRAPH) | Hand-coded interior design guidelines (clearance, circulation, conversation, balance) as a density function, sampled with MCMC; interactive suggestions | Room + furniture set → ranked layout suggestions while the user edits | Guidelines alone produce layouts that users rate as good; interactive suggestions work in real time | Rules hand-tuned per room type; no style or budget awareness | **Directly adopted**: our auto-layout v1 is a guideline-based scoring function (clearance, wall alignment, walkways) |
+| 2 | Yu et al., *Make it home: automatic optimization of furniture arrangement* | 2011 | ACM TOG (SIGGRAPH) | Priors learned from example scenes (pairwise relations, accessibility, visibility) in a cost function, optimised by simulated annealing | Room + furniture set → full arrangement | Perceptual study: results comparable to human designers | Slow (seconds–minutes); needs example scenes | Accessibility/visibility cost terms reused; simulated annealing is a candidate for layout v2 |
+| 3 | Fisher et al., *Example-based synthesis of 3D object arrangements* | 2012 | ACM TOG (SIGGRAPH Asia) | Probabilistic model of object co-occurrence and relative placement learned from a few examples | Few example scenes → many new arrangements | Very few examples are enough for plausible variety | Small, hand-modelled datasets; evaluation mostly qualitative | Motivates using co-occurrence statistics ("a sofa usually comes with a coffee table") in recommendations |
+| 4 | Bell & Bala, *Learning visual similarity for product design with CNNs* | 2015 | ACM TOG (SIGGRAPH) | Siamese CNN embedding of furniture product photos and in-situ photos (Houzz data) | Photo → visually similar products | Embedding supports "find this product" and style-similar search across contexts | Requires large labelled photo set; similarity ≠ compatibility | Basis for future image/style embedding of the catalog (pgvector); out of scope for v1 |
+| 5 | Wang et al., *Deep convolutional priors for indoor scene synthesis* | 2018 | ACM TOG (SIGGRAPH) | CNN on top-down room images predicts which object to add next and where | Empty room → furnished room (iterative) | Learned priors outperform hand-crafted ones in user studies | Trained on SUNCG (no longer available); slow per-object inference | Shows the shift from rules to learned priors; we document why we start with rules |
+| 6 | Wang et al., *PlanIT: Planning and instantiating indoor scenes with relation graph and spatial prior networks* | 2019 | ACM TOG (SIGGRAPH) | Two stages: generate a relation graph of objects, then instantiate positions with spatial priors | Room → relation graph → layout | Graph representation is controllable and interpretable | Training data dependency; complexity | Our data model stores explicit object relations (e.g. *faces*, *next-to*) so a graph method can be plugged in later |
+| 7 | Ritchie, Wang & Lin, *Fast and flexible indoor scene synthesis via deep convolutional generative models* | 2019 | CVPR | Faster autoregressive CNN pipeline (category, location, orientation, size modules) | Partial room → completed room | ~Order-of-magnitude speed-up vs. [5]; supports scene completion | Still image-based; limited object types | "Complete my room" is a use case we adopt (UC-06 auto-layout on a partially furnished room) |
+| 8 | Burke, *Hybrid recommender systems: survey and experiments* | 2002 | UMUAI (journal) | Taxonomy of hybrid recommenders (weighted, switching, cascade, feature combination, …) | — | Hybrids overcome cold-start of collaborative filtering | Pre-deep-learning; e-commerce focus | We have no user history (cold start), so v1 is knowledge/content-based with a *weighted* hybrid planned |
+| 9 | Felfernig & Burke, *Constraint-based recommender systems: technologies and research issues* | 2008 | ICEC (ACM) | Recommendation as constraint satisfaction over explicit requirements | User requirements → feasible ranked items + explanations | Works without rating data; naturally explainable | Knowledge acquisition effort; brittle when no item satisfies all constraints | **Directly adopted**: hard constraints (fits in room, under budget) + soft scoring (style match), with "why recommended" explanations |
+| 10 | Fu et al., *3D-FRONT: 3D furnished rooms with layouts and semantics* | 2021 | ICCV | Large dataset: ~19k professionally designed rooms with 3D-FUTURE furniture | — | De-facto benchmark for scene synthesis after SUNCG was withdrawn | Chinese apartment layouts dominate; licence restricts commercial use | Candidate source of layout statistics and evaluation scenes for FR-06 |
+| 11 | Fu et al., *3D-FUTURE: 3D furniture shape with texture* | 2021 | IJCV 129 | Dataset of 9,992 textured 3D furniture models with attributes (style, material, category) | — | Detailed attributes enable style-aware retrieval | Research licence; models are heavy for web use | Style/material taxonomy reused in our catalog schema |
+| 12 | Paschalidou et al., *ATISS: Autoregressive transformers for indoor scene synthesis* | 2021 | NeurIPS | Scene as an unordered set of objects; transformer predicts attributes of the next object | Floor plan → object set (category, size, position, angle) | Faster and more plausible than CNN methods; supports completion and rearrangement | Requires GPU training on 3D-FRONT; overlaps still occur | Benchmark baseline for a possible ML layout module; motivates our physical-validity metrics (overlap rate) |
+| 13 | Öztürkcan, *Service innovation: Using augmented reality in the IKEA Place app* | 2021 | J. of IT Teaching Cases 11(1) | Case study of IKEA Place | — | AR addresses the key barrier of furniture e-commerce: uncertainty about size and fit | Single-company case; descriptive | Supports the problem statement (fit/scale uncertainty) |
+| 14 | Kowalczuk, Siepmann & Adler, *Cognitive, affective, and behavioral consumer responses to augmented reality in e-commerce* | 2021 | J. of Business Research 124 | Survey-based comparative study, IKEA Place app vs. IKEA mobile website | — | AR increases enjoyment and immersion; interactivity and reality congruence drive reuse and purchase intention; the website scored higher on perceived usefulness | Smartphone-only, one retailer | Supports NFR-03 focus on interactivity and the decision to measure both usefulness and enjoyment in evaluation |
+| 15 | Feng et al., *LayoutGPT: Compositional visual planning and generation with LLMs* | 2023 | NeurIPS | LLM prompted with in-context layout examples in CSS-like format | Text → 2D / 3D layout | Comparable to supervised methods on 3D indoor scenes without training | Depends on proprietary LLM; numeric errors | Option for natural-language requests ("cosy reading corner") in a later iteration |
+| 16 | Yang et al., *Holodeck: Language guided generation of 3D embodied AI environments* | 2024 | CVPR | GPT-4 proposes spatial relational constraints; a solver optimises the layout; assets from Objaverse | Text → full 3D scene | Human raters preferred it over procedural baselines for residential scenes | LLM cost and latency; asset quality varies | **Key design idea adopted**: LLM (optional) produces *constraints*, a deterministic solver places objects — keeps results valid |
+| 17 | Lin & Mu, *InstructScene: Instruction-driven 3D indoor scene synthesis with semantic graph prior* | 2024 | ICLR | Semantic graph prior + layout decoder conditioned on instructions | Instruction → graph → layout | Better controllability than direct object-distribution models | Research code; trained on 3D-FRONT | Confirms value of an explicit relation graph (see [6]) |
+| 18 | Tang et al., *DiffuScene: Denoising diffusion models for generative indoor scene synthesis* | 2024 | CVPR | Diffusion over unordered object sets, then shape retrieval | Noise/text → object set | More physically plausible and diverse scenes than ATISS on 3D-FRONT | Heavy training; offline only | State of the art reference for the evaluation baseline discussion |
+| T1 | Khronos Group, *glTF 2.0 Specification* | 2021 | Standard | Runtime 3D asset format | — | Compact, PBR materials, web-native | — | Furniture models are stored and delivered as glTF/GLB |
+| T2 | three.js documentation; pmndrs, *React Three Fiber documentation* | 2026 | Technical docs | WebGL scene graph; declarative React renderer for three.js | — | Mature ecosystem (controls, loaders, helpers) | WebGL performance limits on low-end devices | Frontend 3D engine (see technology comparison) |
+| T3 | Brooke, *SUS: A "quick and dirty" usability scale* | 1996 | Book chapter (foundational) | 10-item usability questionnaire | — | Industry standard; score 68 ≈ average | Measures perceived usability only | Instrument for NFR-03 in the evaluation plan |
+
+*T3 is a scientific publication kept as a foundational work; it is counted among the scientific sources.*
+
+## 3. Critical synthesis
+
+### 3.1 Furniture arrangement (RQ1)
+
+Three generations of methods are visible:
+
+1. **Rule- and guideline-based optimisation** [1, 2]. Interior design knowledge (clearances, walkways, facing relations, wall alignment) is written as a cost function and optimised with MCMC or simulated annealing. These methods are *explainable, need no training data and guarantee constraints*, but each rule must be authored and weighted by hand, and results can look generic.
+2. **Learned priors from scene datasets** [3, 5, 6, 7]. Models learn where objects usually go from thousands of designed rooms. Quality improved, but they depend on large datasets (SUNCG was withdrawn for licensing reasons, which invalidated much prior work) and they do not guarantee physical validity.
+3. **Generative and language-driven models** [12, 15–18]. Transformers, diffusion models and LLMs produce diverse, controllable scenes and accept text instructions. However, they need GPU training on 3D-FRONT [10], the overlap/out-of-bounds problem is reduced but not eliminated [12, 18], and LLM-based pipelines add cost, latency and non-determinism [15, 16].
+
+**What the project takes from this.** A recurring and well-supported pattern is to separate *what should be in the room and how objects relate* from *exact geometric placement*, and to let a deterministic solver guarantee validity [1, 6, 16, 17]. Our design follows it: a rule-based solver (v1, from [1, 2]) places objects and enforces hard constraints (inside room, no overlap, door clearance); the "intelligent" layer proposes items and relations. A learned or LLM model can replace the proposal layer later without changing the validation guarantees.
+
+**Limitation we accept.** Our v1 layout will be less varied than learned models. We judge this acceptable for a diploma prototype because validity and explainability matter more to a buyer than variety, and we will measure validity explicitly (overlap rate, clearance violations) in the evaluation plan.
+
+### 3.2 Furniture recommendation (RQ2)
+
+Collaborative filtering requires interaction history that a new system does not have (cold start) [8]. Constraint- and knowledge-based recommenders [9] fit furniture especially well because requirements are explicit and hard (the sofa must physically fit and cost less than the budget) and because they can explain each recommendation. Visual embeddings [4, 11] capture style similarity but similarity is not the same as compatibility, and they require labelled image data.
+
+**What the project takes from this.** v1 is a constraint-based recommender with weighted soft scoring (style, colour, size ratio to room, price), producing a human-readable explanation per item. A content-based embedding (pgvector) is planned as a second signal in a weighted hybrid [8] once the catalog has images.
+
+### 3.3 Visualisation and user evaluation (RQ3)
+
+Studies of IKEA Place [13, 14] show that the main purchase barrier online is uncertainty about size and fit, and that interactive visualisation increases enjoyment and purchase intention; interestingly, the plain website was still rated more *useful*. This suggests that 3D alone is not enough: the tool must also support the decision (dimensions, cost, alternatives). Our evaluation therefore measures task success and decision confidence, not only satisfaction, and uses SUS [T3] for comparability.
+
+## 4. Verified knowledge vs. assumptions
+
+| Statement | Status | Basis |
+|-----------|--------|-------|
+| Guideline-based optimisation produces layouts users rate as acceptable | Verified in literature | [1, 2] perceptual studies |
+| Learned/generative layout methods do not guarantee physical validity | Verified in literature | overlap metrics reported in [12, 18] |
+| Size/fit uncertainty is a main barrier to buying furniture online | Verified in literature (one retailer) | [13, 14]; to be re-checked in our interviews (see `relevance-evidence.md`) |
+| Our target users prefer a browser tool over an app install | **Assumption** | To be verified in interviews |
+| A rule-based solver is fast enough (< 2 s) for 5–20 items | **Assumption** | To be measured (NFR-02) |
+
+## 5. Gaps that justify the project
+
+- Research systems [5–7, 10–18] output layouts but do not connect to a purchasable catalog, prices or the user's budget.
+- Commercial tools (see `existing-systems.md`) offer 3D/AR viewing but limited, opaque "AI" with no explanation of why an item fits.
+- Few systems combine **explainable recommendations + guaranteed-valid automatic layout + browser-based 3D** in one workflow. This combination is the project's contribution.
+
+## 6. References
+
+1. Merrell, P., Schkufza, E., Li, Z., Agrawala, M., & Koltun, V. (2011). Interactive furniture layout using interior design guidelines. *ACM Transactions on Graphics, 30*(4), Article 87.
+2. Yu, L.-F., Yeung, S.-K., Tang, C.-K., Terzopoulos, D., Chan, T. F., & Osher, S. J. (2011). Make it home: Automatic optimization of furniture arrangement. *ACM Transactions on Graphics, 30*(4), Article 86. https://doi.org/10.1145/1964921.1964981
+3. Fisher, M., Ritchie, D., Savva, M., Funkhouser, T., & Hanrahan, P. (2012). Example-based synthesis of 3D object arrangements. *ACM Transactions on Graphics, 31*(6), Article 135.
+4. Bell, S., & Bala, K. (2015). Learning visual similarity for product design with convolutional neural networks. *ACM Transactions on Graphics, 34*(4), Article 98.
+5. Wang, K., Savva, M., Chang, A. X., & Ritchie, D. (2018). Deep convolutional priors for indoor scene synthesis. *ACM Transactions on Graphics, 37*(4), Article 70.
+6. Wang, K., Lin, Y.-A., Weissmann, B., Savva, M., Chang, A. X., & Ritchie, D. (2019). PlanIT: Planning and instantiating indoor scenes with relation graph and spatial prior networks. *ACM Transactions on Graphics, 38*(4), Article 132.
+7. Ritchie, D., Wang, K., & Lin, Y.-A. (2019). Fast and flexible indoor scene synthesis via deep convolutional generative models. In *Proc. IEEE/CVF CVPR* (pp. 6182–6190).
+8. Burke, R. (2002). Hybrid recommender systems: Survey and experiments. *User Modeling and User-Adapted Interaction, 12*(4), 331–370.
+9. Felfernig, A., & Burke, R. (2008). Constraint-based recommender systems: Technologies and research issues. In *Proc. 10th International Conference on Electronic Commerce (ICEC '08)*. ACM.
+10. Fu, H., Cai, B., Gao, L., Zhang, L.-X., Wang, J., Li, C., et al. (2021). 3D-FRONT: 3D furnished rooms with layouts and semantics. In *Proc. IEEE/CVF ICCV* (pp. 10933–10942).
+11. Fu, H., Jia, R., Gao, L., Gong, M., Zhao, B., Maybank, S., & Tao, D. (2021). 3D-FUTURE: 3D furniture shape with texture. *International Journal of Computer Vision, 129*, 3313–3337. https://doi.org/10.1007/s11263-021-01534-z
+12. Paschalidou, D., Kar, A., Shugrina, M., Kreis, K., Geiger, A., & Fidler, S. (2021). ATISS: Autoregressive transformers for indoor scene synthesis. In *Advances in Neural Information Processing Systems 34 (NeurIPS 2021)*.
+13. Öztürkcan, S. (2021). Service innovation: Using augmented reality in the IKEA Place app. *Journal of Information Technology Teaching Cases, 11*(1), 8–13. https://doi.org/10.1177/2043886920947110
+14. Kowalczuk, P., Siepmann, C., & Adler, J. (2021). Cognitive, affective, and behavioral consumer responses to augmented reality in e-commerce: A comparative study. *Journal of Business Research, 124*, 357–373. https://doi.org/10.1016/j.jbusres.2020.10.050
+15. Feng, W., Zhu, W., Fu, T.-J., Jampani, V., Akula, A., He, X., Basu, S., Wang, X. E., & Wang, W. Y. (2023). LayoutGPT: Compositional visual planning and generation with large language models. In *Advances in Neural Information Processing Systems 36 (NeurIPS 2023)*. arXiv:2305.15393
+16. Yang, Y., Sun, F.-Y., Weihs, L., VanderBilt, E., Herrasti, A., Han, W., et al. (2024). Holodeck: Language guided generation of 3D embodied AI environments. In *Proc. IEEE/CVF CVPR*. arXiv:2312.09067
+17. Lin, C., & Mu, Y. (2024). InstructScene: Instruction-driven 3D indoor scene synthesis with semantic graph prior. In *Proc. ICLR 2024*. arXiv:2402.04717
+18. Tang, J., Nie, Y., Markhasin, L., Dai, A., Thies, J., & Nießner, M. (2024). DiffuScene: Denoising diffusion models for generative indoor scene synthesis. In *Proc. IEEE/CVF CVPR* (pp. 20507–20518). arXiv:2303.14207
+
+Technical sources:
+
+- T1. Khronos Group. *glTF™ 2.0 Specification*. https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
+- T2. three.js documentation, https://threejs.org/docs/ ; Poimandres, *React Three Fiber documentation*, https://r3f.docs.pmnd.rs/
+- T3. Brooke, J. (1996). SUS: A "quick and dirty" usability scale. In P. W. Jordan et al. (Eds.), *Usability Evaluation in Industry* (pp. 189–194). Taylor & Francis.
+
+> **Before submission:** each team member should open the papers they present and re-check page numbers and DOIs; reference details were verified against publisher/CVF/arXiv listings on 2026-10-20 but page ranges for [3–7] were not individually re-checked.
