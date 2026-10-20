@@ -1,0 +1,126 @@
+%% Database schema (ER diagram, draft) - DIP-27
+erDiagram
+    USERS ||--o{ ROOMS : owns
+    USERS ||--o{ PROJECTS : owns
+    ROOMS ||--o{ ROOM_OPENINGS : has
+    ROOMS ||--o{ PROJECTS : "planned in"
+    PROJECTS ||--o{ PLACEMENTS : contains
+    FURNITURE_ITEMS ||--o{ PLACEMENTS : "placed as"
+    STORES ||--o{ FURNITURE_ITEMS : sells
+    CATEGORIES ||--o{ FURNITURE_ITEMS : groups
+    FURNITURE_ITEMS ||--o{ ITEM_STYLES : tagged
+    STYLES ||--o{ ITEM_STYLES : tags
+    FURNITURE_ITEMS ||--o{ ITEM_IMAGES : has
+    FURNITURE_ITEMS ||--o| ITEM_MODELS : "has 3D model"
+    FURNITURE_ITEMS ||--o| ITEM_EMBEDDINGS : "embedded as"
+    STORES ||--o{ IMPORT_RUNS : "parsed in"
+
+    USERS {
+        uuid id PK
+        text email UK
+        text password_hash
+        text role "user | admin"
+        timestamptz created_at
+    }
+    ROOMS {
+        uuid id PK
+        uuid user_id FK
+        text name
+        text room_type "living_room | bedroom | office | ..."
+        jsonb floor_polygon "vertices in cm"
+        int height_cm
+    }
+    ROOM_OPENINGS {
+        uuid id PK
+        uuid room_id FK
+        text kind "door | window"
+        int wall_index
+        int offset_cm
+        int width_cm
+        int height_cm
+        int sill_cm "windows"
+        text swing "doors: in | out"
+    }
+    PROJECTS {
+        uuid id PK
+        uuid user_id FK
+        uuid room_id FK
+        text name
+        text styles "array"
+        int budget_kzt
+        timestamptz updated_at
+    }
+    PLACEMENTS {
+        uuid id PK
+        uuid project_id FK
+        uuid item_id FK
+        int x_cm
+        int z_cm
+        int rotation_deg
+        bool locked
+    }
+    STORES {
+        int id PK
+        text name
+        text base_url
+        int rate_limit_rpm
+    }
+    CATEGORIES {
+        int id PK
+        text slug UK
+        int default_clearance_cm
+        bool against_wall
+    }
+    FURNITURE_ITEMS {
+        uuid id PK
+        int store_id FK
+        int category_id FK
+        text external_id "store SKU"
+        text name
+        text description
+        int width_cm
+        int depth_cm
+        int height_cm
+        int price_kzt
+        text material
+        text color
+        text url
+        timestamptz scraped_at
+        bool active
+    }
+    STYLES {
+        int id PK
+        text slug UK
+    }
+    ITEM_STYLES {
+        uuid item_id FK
+        int style_id FK
+        real confidence
+    }
+    ITEM_IMAGES {
+        uuid id PK
+        uuid item_id FK
+        text s3_key
+        int position
+    }
+    ITEM_MODELS {
+        uuid item_id PK
+        text s3_key "GLB in MinIO"
+        text source "seller | cc0 | parametric"
+        text licence
+        int triangles
+    }
+    ITEM_EMBEDDINGS {
+        uuid item_id PK
+        vector image_vec "pgvector, 512"
+        vector text_vec "pgvector, 512"
+        text model_name
+    }
+    IMPORT_RUNS {
+        uuid id PK
+        int store_id FK
+        timestamptz started_at
+        int items_added
+        int items_updated
+        int rows_rejected
+    }
