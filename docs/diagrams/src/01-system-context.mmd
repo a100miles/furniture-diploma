@@ -1,0 +1,26 @@
+%% System context diagram (C4 level 1) - DIP-8
+flowchart LR
+    user["👤 Home user<br/><i>Person furnishing a room;<br/>sets up room, picks furniture,<br/>arranges it in 3D</i>"]
+    designer["👤 Interior designer / seller<br/><i>Uses the tool with clients</i>"]
+    admin["👤 Catalog administrator<br/><i>Maintains furniture catalog,<br/>prices and 3D models</i>"]
+
+    system[["<b>AI Furniture Planner</b><br/><i>Web system for AI-assisted<br/>furniture selection and<br/>3D room planning</i>"]]
+
+    retailer["🏬 Furniture retailer data<br/><i>[External] product feeds:<br/>dimensions, prices, images</i>"]
+    models["🧊 3D model sources<br/><i>[External] glTF/GLB models<br/>(retailer or CC0 libraries)</i>"]
+    llm["🤖 LLM API<br/><i>[External, optional] turns text<br/>requests into layout constraints</i>"]
+
+    user -- "Room dimensions, style, budget;<br/>edits layout (HTTPS, browser)" --> system
+    system -- "3D scene, recommendations<br/>with explanations, cost summary" --> user
+    designer -- "Same as home user" --> system
+    admin -- "Manages catalog (admin UI / import)" --> system
+    retailer -- "Product data (CSV/JSON import)" --> system
+    models -- "GLB files" --> system
+    system -. "Prompt → constraints (HTTPS/JSON)" .-> llm
+
+    classDef person fill:#08427b,stroke:#052e56,color:#fff
+    classDef sys fill:#1168bd,stroke:#0b4884,color:#fff
+    classDef ext fill:#999,stroke:#6b6b6b,color:#fff
+    class user,designer,admin person
+    class system sys
+    class retailer,models,llm ext
