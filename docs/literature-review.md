@@ -10,9 +10,9 @@ This review answers three questions that shape the system design:
 2. **RQ2.** Which approaches exist for recommending furniture to a user (by style, size, budget, compatibility), including multimodal (image + text) search?
 3. **RQ3.** What is known about how consumers use 3D / AR visualisation when choosing furniture, and how such systems should be evaluated?
 
-**Search.** Google Scholar, ACM Digital Library, IEEE Xplore, CVF Open Access and arXiv were searched with the terms *furniture arrangement*, *indoor scene synthesis*, *layout optimization*, *furniture recommendation*, *visual compatibility*, *constraint-based recommender*, *multimodal product search*, *CLIP retrieval*, *complementary product recommendation*, *approximate nearest neighbour*, *ranking evaluation*, *augmented reality furniture retail*, *usability scale*. Vendor pages and technical documentation were used only for describing tools and standards, never as evidence of scientific claims.
+**Search.** Google Scholar, ACM Digital Library, IEEE Xplore, SpringerLink, ScienceDirect and CVF Open Access were searched with the terms *furniture arrangement*, *indoor scene synthesis*, *layout optimization*, *furniture recommendation*, *visual compatibility*, *constraint-based recommender*, *multimodal product search*, *CLIP retrieval*, *complementary product recommendation*, *approximate nearest neighbour*, *ranking evaluation*, *augmented reality furniture retail*, *usability scale*. Vendor pages and technical documentation were used only for describing tools and standards, never as evidence of scientific claims.
 
-**Inclusion criteria.** (a) Peer-reviewed or a widely used technical standard; (b) directly relevant to RQ1–RQ3; (c) the core body published 2021–2026 (the field moves fast since the arrival of transformer, diffusion and LLM methods), with foundational works kept where later work builds on them.
+**Inclusion criteria.** (a) Peer-reviewed publication from a recognised publisher or conference (ACM, IEEE, Springer, Elsevier, SAGE, CVF, NeurIPS, ICLR, PMLR), or an official technical standard; preprint servers and unofficial copies are not used; (b) directly relevant to RQ1–RQ3; (c) the core body published 2021–2026 (the field moves fast since the arrival of transformer, diffusion and LLM methods), with foundational works kept where later work builds on them.
 
 **Result.** 25 sources are used: 23 scientific publications (22 numbered works plus the SUS paper T3; 10 of them from 2021 or later) and 2 technical sources (T1, T2). Sources are cited as [n] and listed in Section 6.
 
@@ -92,33 +92,33 @@ Studies of IKEA Place [13, 14] show that the main purchase barrier online is unc
 
 ## 6. References
 
-1. Merrell, P., Schkufza, E., Li, Z., Agrawala, M., & Koltun, V. (2011). Interactive furniture layout using interior design guidelines. *ACM Transactions on Graphics, 30*(4), Article 87.
+1. Merrell, P., Schkufza, E., Li, Z., Agrawala, M., & Koltun, V. (2011). Interactive furniture layout using interior design guidelines. *ACM Transactions on Graphics, 30*(4), Article 87. https://doi.org/10.1145/1964921.1964982
 2. Yu, L.-F., Yeung, S.-K., Tang, C.-K., Terzopoulos, D., Chan, T. F., & Osher, S. J. (2011). Make it home: Automatic optimization of furniture arrangement. *ACM Transactions on Graphics, 30*(4), Article 86. https://doi.org/10.1145/1964921.1964981
 3. Fisher, M., Ritchie, D., Savva, M., Funkhouser, T., & Hanrahan, P. (2012). Example-based synthesis of 3D object arrangements. *ACM Transactions on Graphics, 31*(6), Article 135.
 4. Bell, S., & Bala, K. (2015). Learning visual similarity for product design with convolutional neural networks. *ACM Transactions on Graphics, 34*(4), Article 98.
-5. Wang, K., Savva, M., Chang, A. X., & Ritchie, D. (2018). Deep convolutional priors for indoor scene synthesis. *ACM Transactions on Graphics, 37*(4), Article 70.
-6. Wang, K., Lin, Y.-A., Weissmann, B., Savva, M., Chang, A. X., & Ritchie, D. (2019). PlanIT: Planning and instantiating indoor scenes with relation graph and spatial prior networks. *ACM Transactions on Graphics, 38*(4), Article 132.
+5. Wang, K., Savva, M., Chang, A. X., & Ritchie, D. (2018). Deep convolutional priors for indoor scene synthesis. *ACM Transactions on Graphics, 37*(4), Article 70. https://doi.org/10.1145/3197517.3201362
+6. Wang, K., Lin, Y.-A., Weissmann, B., Savva, M., Chang, A. X., & Ritchie, D. (2019). PlanIT: Planning and instantiating indoor scenes with relation graph and spatial prior networks. *ACM Transactions on Graphics, 38*(4), Article 132. https://doi.org/10.1145/3306346.3322941
 7. Ritchie, D., Wang, K., & Lin, Y.-A. (2019). Fast and flexible indoor scene synthesis via deep convolutional generative models. In *Proc. IEEE/CVF CVPR* (pp. 6182–6190).
-8. Burke, R. (2002). Hybrid recommender systems: Survey and experiments. *User Modeling and User-Adapted Interaction, 12*(4), 331–370.
-9. Felfernig, A., & Burke, R. (2008). Constraint-based recommender systems: Technologies and research issues. In *Proc. 10th International Conference on Electronic Commerce (ICEC '08)*. ACM.
+8. Burke, R. (2002). Hybrid recommender systems: Survey and experiments. *User Modeling and User-Adapted Interaction, 12*(4), 331–370. https://doi.org/10.1023/A:1021240730564
+9. Felfernig, A., & Burke, R. (2008). Constraint-based recommender systems: Technologies and research issues. In *Proc. 10th International Conference on Electronic Commerce (ICEC '08)*. ACM. https://doi.org/10.1145/1409540.1409544
 10. Fu, H., Cai, B., Gao, L., Zhang, L.-X., Wang, J., Li, C., et al. (2021). 3D-FRONT: 3D furnished rooms with layouts and semantics. In *Proc. IEEE/CVF ICCV* (pp. 10933–10942).
 11. Fu, H., Jia, R., Gao, L., Gong, M., Zhao, B., Maybank, S., & Tao, D. (2021). 3D-FUTURE: 3D furniture shape with texture. *International Journal of Computer Vision, 129*, 3313–3337. https://doi.org/10.1007/s11263-021-01534-z
-12. Paschalidou, D., Kar, A., Shugrina, M., Kreis, K., Geiger, A., & Fidler, S. (2021). ATISS: Autoregressive transformers for indoor scene synthesis. In *Advances in Neural Information Processing Systems 34 (NeurIPS 2021)*.
+12. Paschalidou, D., Kar, A., Shugrina, M., Kreis, K., Geiger, A., & Fidler, S. (2021). ATISS: Autoregressive transformers for indoor scene synthesis. In *Advances in Neural Information Processing Systems 34 (NeurIPS 2021)* (pp. 12013–12026).
 13. Öztürkcan, S. (2021). Service innovation: Using augmented reality in the IKEA Place app. *Journal of Information Technology Teaching Cases, 11*(1), 8–13. https://doi.org/10.1177/2043886920947110
 14. Kowalczuk, P., Siepmann, C., & Adler, J. (2021). Cognitive, affective, and behavioral consumer responses to augmented reality in e-commerce: A comparative study. *Journal of Business Research, 124*, 357–373. https://doi.org/10.1016/j.jbusres.2020.10.050
-15. Feng, W., Zhu, W., Fu, T.-J., Jampani, V., Akula, A., He, X., Basu, S., Wang, X. E., & Wang, W. Y. (2023). LayoutGPT: Compositional visual planning and generation with large language models. In *Advances in Neural Information Processing Systems 36 (NeurIPS 2023)*. arXiv:2305.15393
-16. Yang, Y., Sun, F.-Y., Weihs, L., VanderBilt, E., Herrasti, A., Han, W., et al. (2024). Holodeck: Language guided generation of 3D embodied AI environments. In *Proc. IEEE/CVF CVPR*. arXiv:2312.09067
-17. Lin, C., & Mu, Y. (2024). InstructScene: Instruction-driven 3D indoor scene synthesis with semantic graph prior. In *Proc. ICLR 2024*. arXiv:2402.04717
-18. Tang, J., Nie, Y., Markhasin, L., Dai, A., Thies, J., & Nießner, M. (2024). DiffuScene: Denoising diffusion models for generative indoor scene synthesis. In *Proc. IEEE/CVF CVPR* (pp. 20507–20518). arXiv:2303.14207
-19. Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., et al. (2021). Learning transferable visual models from natural language supervision. In *Proc. 38th International Conference on Machine Learning (ICML)*, PMLR 139, 8748–8763. arXiv:2103.00020
-20. Kang, W.-C., Kim, E., Leskovec, J., Rosenberg, C., & McAuley, J. (2019). Complete the look: Scene-based complementary product recommendation. In *Proc. IEEE/CVF CVPR* (pp. 10532–10541).
+15. Feng, W., Zhu, W., Fu, T.-J., Jampani, V., Akula, A., He, X., Basu, S., Wang, X. E., & Wang, W. Y. (2023). LayoutGPT: Compositional visual planning and generation with large language models. In *Advances in Neural Information Processing Systems 36 (NeurIPS 2023)*. https://proceedings.neurips.cc/paper_files/paper/2023/hash/3a7f9e485845dac27423375c934cb4db-Abstract-Conference.html
+16. Yang, Y., Sun, F.-Y., Weihs, L., VanderBilt, E., Herrasti, A., Han, W., et al. (2024). Holodeck: Language guided generation of 3D embodied AI environments. In *Proc. IEEE/CVF CVPR*. https://openaccess.thecvf.com/content/CVPR2024/papers/Yang_Holodeck_Language_Guided_Generation_of_3D_Embodied_AI_Environments_CVPR_2024_paper.pdf
+17. Lin, C., & Mu, Y. (2024). InstructScene: Instruction-driven 3D indoor scene synthesis with semantic graph prior. In *Proc. 12th International Conference on Learning Representations (ICLR 2024)*. https://proceedings.iclr.cc/paper_files/paper/2024/hash/6d96950e6ce0b92e3d0fb2afa634e0f2-Abstract-Conference.html
+18. Tang, J., Nie, Y., Markhasin, L., Dai, A., Thies, J., & Nießner, M. (2024). DiffuScene: Denoising diffusion models for generative indoor scene synthesis. In *Proc. IEEE/CVF CVPR* (pp. 20507–20518). https://doi.org/10.1109/CVPR52733.2024.01938
+19. Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., et al. (2021). Learning transferable visual models from natural language supervision. In *Proc. 38th International Conference on Machine Learning (ICML)*, PMLR 139, 8748–8763. https://proceedings.mlr.press/v139/radford21a.html
+20. Kang, W.-C., Kim, E., Leskovec, J., Rosenberg, C., & McAuley, J. (2019). Complete the look: Scene-based complementary product recommendation. In *Proc. IEEE/CVF CVPR* (pp. 10532–10541). https://openaccess.thecvf.com/content_CVPR_2019/html/Kang_Complete_the_Look_Scene-Based_Complementary_Product_Recommendation_CVPR_2019_paper.html
 21. Malkov, Y. A., & Yashunin, D. A. (2020). Efficient and robust approximate nearest neighbor search using hierarchical navigable small world graphs. *IEEE Transactions on Pattern Analysis and Machine Intelligence, 42*(4), 824–836. https://doi.org/10.1109/TPAMI.2018.2889473
-22. Järvelin, K., & Kekäläinen, J. (2002). Cumulated gain-based evaluation of IR techniques. *ACM Transactions on Information Systems, 20*(4), 422–446.
+22. Järvelin, K., & Kekäläinen, J. (2002). Cumulated gain-based evaluation of IR techniques. *ACM Transactions on Information Systems, 20*(4), 422–446. https://doi.org/10.1145/582415.582418
 
 Technical sources:
 
 - T1. Khronos Group. *glTF™ 2.0 Specification*. https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
 - T2. three.js documentation, https://threejs.org/docs/ ; Poimandres, *React Three Fiber documentation*, https://r3f.docs.pmnd.rs/
-- T3. Brooke, J. (1996). SUS: A "quick and dirty" usability scale. In P. W. Jordan et al. (Eds.), *Usability Evaluation in Industry* (pp. 189–194). Taylor & Francis.
+- T3. Brooke, J. (1996). SUS: A "quick and dirty" usability scale. In P. W. Jordan et al. (Eds.), *Usability Evaluation in Industry* (pp. 189–194). Taylor & Francis. See also Brooke, J. (2013). SUS: A retrospective. *Journal of Usability Studies, 8*(2), 29–40.
 
-> **Before submission:** each team member should open the papers they present and re-check page numbers and DOIs; reference details were verified against publisher/CVF/arXiv listings on 2026-10-20 but page ranges for [3–7] and the volume/pages of [21] were not individually re-checked.
+> **Before submission:** each team member should open the papers they present and re-check page numbers and DOIs; reference details were verified against publisher and CVF listings on 2026-10-20/21 but page ranges for [3–7] and the volume/pages of [21] were not individually re-checked.

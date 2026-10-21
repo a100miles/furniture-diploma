@@ -106,3 +106,4 @@ Requirement IDs (FR-xx, NFR-xx) refer to `requirements.md`.
 
 - Järvelin, K., & Kekäläinen, J. (2002). Cumulated gain-based evaluation of IR techniques. *ACM Transactions on Information Systems, 20*(4), 422–446.
 - Brooke, J. (1996). SUS: A "quick and dirty" usability scale. In *Usability Evaluation in Industry* (pp. 189–194). Taylor & Francis.
+- Brooke, J. (2013). SUS: A retrospective. *Journal of Usability Studies, 8*(2), 29–40.

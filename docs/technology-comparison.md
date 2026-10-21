@@ -257,7 +257,7 @@ This design keeps the core behaviour deterministic, explainable and measurable f
 - react-three-fiber documentation: https://r3f.docs.pmnd.rs/
 - Babylon.js documentation: https://doc.babylonjs.com/
 - Unity Web platform documentation: https://docs.unity3d.com/Manual/webgl.html
-- Radford, A., et al. (2021). Learning Transferable Visual Models From Natural Language Supervision (CLIP). *ICML 2021*.
+- Radford, A., et al. (2021). Learning Transferable Visual Models From Natural Language Supervision (CLIP). *Proc. ICML 2021*, PMLR 139, 8748–8763.
 - Go documentation: https://go.dev/doc/
 - FastAPI documentation: https://fastapi.tiangolo.com/
 - NestJS documentation: https://docs.nestjs.com/
