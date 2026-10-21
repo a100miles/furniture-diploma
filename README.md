@@ -80,7 +80,7 @@ Justification: [docs/technology-comparison.md](docs/technology-comparison.md).
 
 ## Links
 
-- **YouTrack:** _TODO: add the YouTrack project URL_ (backlog import file: [project-management/youtrack-backlog.csv](project-management/youtrack-backlog.csv))
+- **YouTrack:** https://furniture-diploma.youtrack.cloud/projects/DIP (backlog import file: [project-management/youtrack-backlog.csv](project-management/youtrack-backlog.csv))
 - **Documentation:** [docs/](docs)
 - **Architecture:** [docs/architecture.md](docs/architecture.md)
 
