@@ -11,7 +11,7 @@ Five systems were selected because each represents a different way the market cu
 | S1 | **IKEA Kreativ** (IKEA app / ikea.com) | Retailer tool, AI + mixed reality | Largest furniture retailer; AI room scan, erase existing furniture, place catalog items |
 | S2 | **Planner 5D** (web, iOS, Android) | General-purpose 2D/3D home planner with AI features | Popular consumer planner; AI floor-plan recognition and a "design generator" |
 | S3 | **HomeByMe** (Dassault Systèmes, web) | Browser 3D planner with branded catalogs | Closest to our "web-based 3D + real products" positioning |
-| S4 | **Homestyler** (web, mobile) | 3D planner + rendering + AI styling | Large model library, photoreal rendering, AI decoration tools |
+| S4 | **Roomle** (web, iOS, Android) | 3D/AR product configurator and room planner for furniture brands | Used by manufacturers and retailers to embed 3D/AR configurators on their sites; represents the B2B, brand-catalogue approach |
 | S5 | **Generative "AI interior" image tools** (e.g. RoomGPT-style restyling apps) | Image generation | Represents pure generative-AI approach: restyle a room photo, no geometry |
 
 ## 2. Comparison criteria
@@ -29,24 +29,24 @@ Criteria follow directly from the project's problem statement (fit/scale uncerta
 | C7 | Explanation of *why* an item/layout is suggested | Transparency of AI decisions |
 | C8 | Budget / total-cost summary | Decision support (FR-09) |
 | C9 | Multi-retailer / open catalog (not locked to one brand) | Freedom of choice |
-| C10 | Free core functionality | Barrier to entry for students and young families |
+| C10 | Works with the assortment of local Kazakhstan stores | Target users buy from local shops (e.g. mebel.kz), which existing tools do not cover |
 
 ## 3. Comparison matrix
 
 Legend: **●** fully supported · **◐** partially / limited · **○** not supported · **?** not confirmed yet.
 
-| Criterion | S1 IKEA Kreativ | S2 Planner 5D | S3 HomeByMe | S4 Homestyler | S5 AI image tools | **Our system (target)** |
+| Criterion | S1 IKEA Kreativ | S2 Planner 5D | S3 HomeByMe | S4 Roomle | S5 AI image tools | **Our system (target)** |
 |-----------|:---:|:---:|:---:|:---:|:---:|:---:|
 | C1 Browser, no install | ◐ (desktop web + app; scan in app) | ● | ● | ● | ● | ● |
 | C2 Interactive 3D with dimensions | ◐ (scanned photo-based scene) | ● | ● | ● | ○ (2D images) | ● |
-| C3 Real products with prices | ● (IKEA only) | ◐ (generic models) | ◐ (selected brands) | ◐ | ○ | ◐ (curated demo catalog) |
-| C4 Personalised recommendations | ◐ | ◐ | ○ | ◐ | ○ | ● |
-| C5 Automatic layout | ○ | ◐ ("design generator") | ○ | ◐ | ○ | ● |
+| C3 Real products with prices | ● (IKEA only) | ◐ (generic models) | ◐ (selected brands) | ◐ | ○ | ● (≥ 5 000 items from local stores) |
+| C4 Personalised recommendations | ◐ | ◐ | ○ | ? | ○ | ● |
+| C5 Automatic layout | ○ | ◐ ("design generator") | ○ | ? | ○ | ● |
 | C6 Validity checks | ? | ? | ? | ? | ○ | ● |
 | C7 Explanations | ○ | ○ | ○ | ○ | ○ | ● |
-| C8 Cost summary | ◐ (shopping list) | ○ | ◐ (shopping list) | ○ | ○ | ● |
-| C9 Open / multi-brand catalog | ○ | ● | ◐ | ● | n/a | ● (data-driven catalog) |
-| C10 Free core | ● | ◐ (freemium) | ◐ (freemium) | ◐ (freemium) | ◐ | ● |
+| C8 Cost summary | ◐ (shopping list) | ○ | ◐ (shopping list) | ? | ○ | ● |
+| C9 Open / multi-brand catalog | ○ | ● | ◐ | ◐ (many brands, one per embed) | n/a | ● (data-driven catalog) |
+| C10 Local KZ assortment | ○ | ○ | ○ | ○ | n/a | ● (parsers for several local stores) |
 
 ## 4. Evidence for claims
 
@@ -59,7 +59,8 @@ The committee asks that capability claims be supported by evidence. Each row cit
 | S2 recognises uploaded floor plans (walls, doors, windows) and offers AI design generator / Smart Wizard; premium features need a subscription | Furniture Today (2021) launch article; planner5d.com AI pages and FAQ | Press/vendor sources; hands-on test pending |
 | S2 recognition dimensions are approximate | Planner 5D FAQ | Vendor source |
 | S3 runs in the browser with branded catalogs | homebyme.com | Vendor source; hands-on test pending |
-| S4 offers AI decoration / rendering features | homestyler.com | Vendor source; hands-on test pending |
+| S4 provides embeddable 3D/AR configurators and a room planner for partner brands' products | roomle.com | Vendor source; hands-on test pending |
+| S1–S4 do not include products of Kazakhstan furniture stores | Catalogue search for local brands in each tool | **To verify** during the hands-on test (C10) |
 | S5 produces restyled 2D images with no geometry or real products | Behaviour of the method class (diffusion image generation) | Inferred from how the method works |
 | No system in S1–S5 explains *why* an item is recommended | Absence in product pages and documentation | **Assumption** until hands-on test (C7 row) |
 | C6 support in S1–S4 unknown | — | Marked "?" deliberately |
@@ -70,7 +71,7 @@ The committee asks that capability claims be supported by evidence. Each row cit
 
 1. **AI is either opaque or absent.** Commercial tools add AI for capture (scan, plan recognition) or styling, not for explainable *selection* of items that fit the user's room, style and budget (C4, C7).
 2. **Layout suggestions do not guarantee validity.** Generative image tools (S5) produce attractive but physically impossible results; planners leave arrangement to the user (C5, C6). The literature (see `literature-review.md`, §3.1) shows how to combine suggestions with guaranteed constraints.
-3. **Catalog lock-in.** The strongest AI tool (S1) works only with one retailer's products (C9).
+3. **Catalog lock-in and no local assortment.** The strongest AI tool (S1) works only with one retailer's products, B2B tools (S4) only with partner brands, and none covers local Kazakhstan stores (C9, C10).
 4. **Decision support is weak.** Few tools summarise total cost against a budget (C8).
 
-The proposed system targets the combination C1 + C2 + C4 + C5 + C6 + C7 + C8. It does **not** try to beat S1 on photoreal room capture or S4 on rendering quality; these are explicitly out of scope.
+The proposed system targets the combination C1 + C2 + C4 + C5 + C6 + C7 + C8 + C10. It does **not** try to beat S1 on photoreal room capture or S4 on configurator depth for a single brand; these are explicitly out of scope.

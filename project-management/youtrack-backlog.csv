@@ -1,25 +1,32 @@
 Issue Id,Summary,Assignee,Priority,Due Date,Description
 DIP-1,"Repository structure, README, .gitignore, config example",Tamerlan Yessimov,Critical,2026-10-21,Acceptance criteria: README covers all items from the guidelines; structure has src/docs/diagrams/tests/config
 DIP-2,Project proposal and scope,Tamerlan Yessimov,Critical,2026-10-22,"Acceptance criteria: Title, team, supervisor, problem, users, aim, objectives, outcomes, scope present"
-DIP-3,"Requirements specification (FR/NFR, priorities, acceptance criteria)",Muzaffar Kapezov,Critical,2026-10-22,Acceptance criteria: Every mandatory requirement has a verifiable acceptance criterion
-DIP-4,Evidence of relevance: 3–5 interviews,Sultanbek Zhumagali,Critical,2026-10-23,Acceptance criteria: ≥ 3 interview records; findings table filled; assumptions separated
-DIP-5,Literature review,Muzaffar Kapezov,Critical,2026-10-22,"Acceptance criteria: ≥ 12 sources, ≥ 8 scientific, analysis table, synthesis"
-DIP-6,Existing system comparison,Sultanbek Zhumagali,Critical,2026-10-22,Acceptance criteria: 3–5 systems × 6–10 criteria; hands-on evidence for each claim
-DIP-7,Technology comparison,Tamerlan Yessimov,Critical,2026-10-22,"Acceptance criteria: ≥ 3 decisions × 2–3 alternatives, justified by requirements"
-DIP-8,"Architecture description and diagrams (context, use case, component)",Tamerlan Yessimov,Critical,2026-10-23,Acceptance criteria: Editable sources + exports in `docs/diagrams/`; consistent with requirements
-DIP-9,UX mockups and prototype,Sultanbek Zhumagali,Critical,2026-10-23,Acceptance criteria: Key scenarios covered; prototype runs locally
-DIP-10,Verification and evaluation plan,Muzaffar Kapezov,Critical,2026-10-22,"Acceptance criteria: Test plan, metrics, conditions, baseline defined"
+DIP-3,"Requirements specification (FR/NFR, priorities, acceptance criteria)",Tamerlan Yessimov,Critical,2026-10-22,Acceptance criteria: Every mandatory requirement has a verifiable acceptance criterion
+DIP-4,Evidence of relevance: 3–5 interviews,Muzaffar Kapezov,Critical,2026-10-23,Acceptance criteria: ≥ 3 interview records; findings table filled; assumptions separated
+DIP-5,"Literature review (recommender systems, multimodal search, layout)",Tamerlan Yessimov,Critical,2026-10-22,"Acceptance criteria: ≥ 12 sources, ≥ 8 scientific, analysis table, synthesis"
+DIP-6,Existing system comparison,Muzaffar Kapezov,Critical,2026-10-22,Acceptance criteria: 3–5 systems × 6–10 criteria; hands-on evidence for each claim
+DIP-7,"Technology comparison (3D libraries; server platform, storage, interaction)",Sultanbek Zhumagali,Critical,2026-10-22,"Acceptance criteria: ≥ 3 decisions × 2–3 alternatives, justified by requirements; 3D library section by Muzaffar"
+DIP-8,"Architecture description and diagrams (context, use case, component)",Sultanbek Zhumagali,Critical,2026-10-23,Acceptance criteria: Editable sources + exports in `docs/diagrams/`; use case diagram by Muzaffar
+DIP-9,UX prototypes of key scenarios,Muzaffar Kapezov,Critical,2026-10-23,"Acceptance criteria: Room setup, selection, placement, saving covered; prototype runs locally"
+DIP-10,Verification and evaluation plan,Tamerlan Yessimov,Critical,2026-10-22,"Acceptance criteria: Test plan, metrics (incl. nDCG@10), conditions, baseline defined"
 DIP-11,"Project management, YouTrack, risks",Tamerlan Yessimov,Critical,2026-10-21,Acceptance criteria: YouTrack populated; risks and milestones documented
-DIP-12,Supervisor review of pre-defense 1 package,,Critical,2026-10-23,Acceptance criteria: Feedback recorded with decisions in `supervisor-feedback.md`
-DIP-13,Backend skeleton: catalog and recommendation API,Tamerlan Yessimov,High,2026-10-23,"Acceptance criteria: `/api/catalog`, `/api/recommendations` with tests passing"
-DIP-14,3D room editor prototype,Sultanbek Zhumagali,High,2026-10-23,"Acceptance criteria: Room setup, add/move/rotate/remove furniture in 3D"
-DIP-15,Auto-layout algorithm v1 (rule-based),Muzaffar Kapezov,High,2026-10-23,Acceptance criteria: No overlaps/out-of-bounds on test rooms; unit tests
+DIP-12,Supervisor review of pre-defense 1 package,Tamerlan Yessimov,Critical,2026-10-23,Acceptance criteria: Feedback recorded with decisions in `supervisor-feedback.md`
+DIP-13,Prototype API: catalogue and recommendation endpoints,Sultanbek Zhumagali,High,2026-10-23,"Acceptance criteria: `/api/catalog`, `/api/recommendations` with tests passing"
+DIP-14,3D room editor prototype,Muzaffar Kapezov,High,2026-10-23,"Acceptance criteria: Room setup, add/move/rotate/remove furniture in 3D"
+DIP-15,Layout module v1: validation and rule-based auto-layout,Sultanbek Zhumagali,High,2026-10-23,Acceptance criteria: No overlaps/out-of-bounds on test rooms; unit tests
 DIP-16,Tag `pre-defense-1` and submission summary,Tamerlan Yessimov,Critical,2026-10-24,Acceptance criteria: Tag on reviewed `main`; summary with limitations and open tasks
-DIP-17,PostgreSQL persistence and save/load projects (FR-08),Tamerlan Yessimov,High,2026-11-30,Acceptance criteria: Projects persist across restarts; migrations
-DIP-18,glTF furniture models and catalog of ≥ 50 items,Sultanbek Zhumagali,High,2026-11-30,Acceptance criteria: Models load < 1 s each; licences recorded
-DIP-19,Clearance and door-swing constraints in layout (FR-07),Muzaffar Kapezov,High,2026-11-30,Acceptance criteria: Clearance violation rate ≤ 5 % on benchmark
-DIP-20,Benchmark set and baselines B1/B2,Muzaffar Kapezov,High,2026-12-20,Acceptance criteria: 30 rooms; metrics script reproducible
-DIP-21,Style embedding recommendations (pgvector),Muzaffar Kapezov,Medium,2027-01-31,Acceptance criteria: Hybrid ranking beats B1 on precision@5
-DIP-22,"CI pipeline (lint, tests) on GitHub Actions",Tamerlan Yessimov,Medium,2026-11-30,Acceptance criteria: Every PR runs tests
-DIP-23,Usability study,Sultanbek Zhumagali,High,,"Acceptance criteria: 8–12 participants, SUS and task metrics reported"
-DIP-24,Optional natural-language requests (LLM → constraints),Muzaffar Kapezov,Low,,Acceptance criteria: Text prompt produces valid constraint set
+DIP-17,"PostgreSQL persistence for users, rooms, projects (FR-08)",Sultanbek Zhumagali,High,2026-11-30,Acceptance criteria: Projects persist across restarts; versioned migrations
+DIP-18,glTF/GLB models with Draco and LOD,Muzaffar Kapezov,High,2026-11-30,Acceptance criteria: Models load < 1 s each; licences recorded
+DIP-19,"Walkways, door and window constraints in layout (FR-39, FR-40)",Sultanbek Zhumagali,High,2026-11-30,Acceptance criteria: Clearance violation rate ≤ 5 % on benchmark
+DIP-20,Layout benchmark set and baselines,Sultanbek Zhumagali,High,2026-12-20,Acceptance criteria: 30 rooms; metrics script reproducible
+DIP-21,Recommendation evaluation set and baseline B1,Tamerlan Yessimov,High,2026-12-20,Acceptance criteria: ≥ 50 labelled queries; Precision@K and nDCG@10 for B1 reported
+DIP-22,"CI pipeline (lint, tests) on GitHub Actions",Sultanbek Zhumagali,Medium,2026-11-30,Acceptance criteria: Every PR runs tests
+DIP-23,Usability study,Muzaffar Kapezov,High,,"Acceptance criteria: 8–12 participants, SUS and task metrics reported"
+DIP-24,"Top-down camera, wall snapping, windows in 3D editor",Muzaffar Kapezov,High,2026-11-30,Acceptance criteria: Plan view and snapping work; windows rendered as openings
+DIP-25,Catalogue parsers for Kazakhstan stores (mebel.kz and others),Sultanbek Zhumagali,Critical,2026-10-23,Acceptance criteria: First catalogue data loaded; robots.txt and rate limits respected; ≥ 5 000 items by pre-defense 2
+DIP-26,"Go core API skeleton (hexagonal architecture, OpenAPI contract)",Sultanbek Zhumagali,High,2026-11-30,Acceptance criteria: Catalogue search endpoint with p95 < 300 ms on 5 000 items
+DIP-27,Database schema,Sultanbek Zhumagali,Critical,2026-10-23,"Acceptance criteria: ER diagram with editable source; covers users, rooms, projects, catalogue, embeddings"
+DIP-28,CLIP image/text embeddings in pgvector,Tamerlan Yessimov,High,2026-12-20,Acceptance criteria: Embeddings for all items with images; similar-item search endpoint
+DIP-29,Natural-language query parsing into filters,Tamerlan Yessimov,Medium,2027-01-31,Acceptance criteria: ≥ 80 % of a 30-query test set parsed into correct filters
+DIP-30,Docker Compose with Redis and MinIO; demo stand,Sultanbek Zhumagali,Medium,2026-12-20,Acceptance criteria: `docker compose up` starts all services
+DIP-31,Parametric 3D models from catalogue dimensions,Muzaffar Kapezov,High,2026-12-20,Acceptance criteria: Bounding box matches catalogue dimensions within 1 cm

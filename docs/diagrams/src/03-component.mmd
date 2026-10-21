@@ -1,52 +1,74 @@
 %% Component diagram (draft) - DIP-8
 flowchart TB
-    subgraph FE["Frontend · React + three.js (React Three Fiber) · browser"]
+    subgraph FE["Web client · TypeScript, React, Vite, Three.js / React Three Fiber · browser (Muzaffar)"]
         direction TB
-        UI["Room setup &amp; panels UI<br/><i>RoomForm, CatalogPanel,<br/>RecommendationPanel, CostSummary</i>"]
-        EDITOR["3D Room Editor<br/><i>Scene, camera controls,<br/>drag/rotate, highlight invalid</i>"]
-        STORE["Project state store<br/><i>room, placed items, selection</i>"]
-        CLIENT["API client<br/><i>typed fetch wrapper</i>"]
-        UI --> STORE
+        PAGES["Pages<br/><i>catalogue, product card,<br/>account &amp; projects</i>"]
+        EDITOR["3D Room Editor<br/><i>room, doors/windows, drag/rotate,<br/>wall snap, top-down &amp; free camera</i>"]
+        ASSETS["Asset loader<br/><i>GLB + Draco, LOD,<br/>parametric models</i>"]
+        STORE["State store"]
+        CLIENT["API client<br/><i>generated from OpenAPI</i>"]
+        PAGES --> STORE
         EDITOR <--> STORE
+        EDITOR --> ASSETS
         STORE --> CLIENT
     end
 
-    subgraph BE["Backend · Python FastAPI"]
+    subgraph API["Core API · Go, net/http, hexagonal architecture (Sultanbek)"]
         direction TB
-        API["REST API layer<br/><i>routers, Pydantic schemas,<br/>OpenAPI docs</i>"]
-        CAT["Catalog service"]
-        REC["Recommendation engine<br/><i>hard constraints + weighted scoring<br/>+ explanations</i>"]
-        LAY["Layout solver<br/><i>rule-based placement v1</i>"]
-        GEO["Geometry &amp; validation<br/><i>footprints, overlap, bounds,<br/>clearance</i>"]
-        PRJ["Project service<br/><i>save / load</i>"]
-        NL["NL constraint adapter<br/><i>(optional, later)</i>"]
-        REPO["Data access layer<br/><i>repositories</i>"]
-        API --> CAT
-        API --> REC
-        API --> LAY
-        API --> PRJ
-        API -.-> NL
-        REC --> CAT
-        REC --> GEO
-        LAY --> GEO
-        CAT --> REPO
-        PRJ --> REPO
+        HTTP["HTTP adapter<br/><i>REST handlers, auth,<br/>OpenAPI contract</i>"]
+        CATS["Catalogue service<br/><i>search, filters</i>"]
+        PROJ["Projects service<br/><i>users, rooms, layouts</i>"]
+        LAYOUT["Layout module<br/><i>AABB/OBB collision checks,<br/>walkways, doors, windows;<br/>constraint-based auto-layout</i>"]
+        RECA["Recommendation port<br/><i>ML client + baseline fallback</i>"]
+        REPO["Repository adapters<br/><i>PostgreSQL, Redis, S3</i>"]
+        HTTP --> CATS
+        HTTP --> PROJ
+        HTTP --> LAYOUT
+        HTTP --> RECA
+        CATS --> REPO
+        PROJ --> REPO
     end
 
-    DB[("PostgreSQL<br/><i>catalog, projects;<br/>pgvector (later)</i>")]
-    FILES[("Static / object storage<br/><i>GLB models, thumbnails</i>")]
-    LLMX["LLM API (external, optional)"]
+    subgraph ML["ML service · Python, FastAPI, PyTorch, Hugging Face (Tamerlan)"]
+        direction TB
+        MLAPI["ML API"]
+        EMB["Embedding module<br/><i>CLIP image + text vectors</i>"]
+        RANK["Ranker<br/><i>room size, budget,<br/>already chosen items</i>"]
+        NLQ["Query parser<br/><i>text → structured filters</i>"]
+        MLAPI --> RANK
+        MLAPI --> NLQ
+        RANK --> EMB
+    end
 
-    CLIENT -- "REST / JSON over HTTPS" --> API
-    EDITOR -- "GET .glb" --> FILES
+    subgraph ETL["Catalogue pipeline · Python (Sultanbek)"]
+        PARSE["Store parsers<br/><i>mebel.kz and others</i>"]
+        NORM["Normaliser<br/><i>dimensions, materials,<br/>colour, price, dedup</i>"]
+        PARSE --> NORM
+    end
+
+    DB[("PostgreSQL + pgvector<br/><i>users, rooms, projects,<br/>catalogue, embeddings</i>")]
+    CACHE[("Redis<br/><i>query cache</i>")]
+    S3[("MinIO (S3)<br/><i>images, GLB models</i>")]
+    STORES["Kazakhstan furniture stores<br/>(external)"]
+
+    CLIENT -- "REST / JSON over HTTPS" --> HTTP
+    ASSETS -- "GET images / .glb" --> S3
+    RECA -- "REST / JSON (internal)" --> MLAPI
     REPO --> DB
-    NL -.-> LLMX
+    REPO --> CACHE
+    REPO --> S3
+    EMB --> DB
+    NORM --> DB
+    NORM --> S3
+    PARSE --> STORES
 
     classDef fe fill:#e8f1fb,stroke:#1168bd,color:#111
     classDef be fill:#eaf7ee,stroke:#2e8b57,color:#111
+    classDef ml fill:#f3ecfb,stroke:#7b4bb7,color:#111
     classDef store fill:#fff6e0,stroke:#c9a227,color:#111
-    classDef opt fill:#f3f3f3,stroke:#999,color:#555,stroke-dasharray: 4 3
-    class UI,EDITOR,STORE,CLIENT fe
-    class API,CAT,REC,LAY,GEO,PRJ,REPO be
-    class DB,FILES store
-    class NL,LLMX opt
+    classDef ext fill:#f3f3f3,stroke:#999,color:#555
+    class PAGES,EDITOR,ASSETS,STORE,CLIENT fe
+    class HTTP,CATS,PROJ,LAYOUT,RECA,REPO,PARSE,NORM be
+    class MLAPI,EMB,RANK,NLQ ml
+    class DB,CACHE,S3 store
+    class STORES ext

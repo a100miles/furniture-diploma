@@ -1,43 +1,46 @@
-# Development of a Web-Based System for AI-Assisted Furniture Selection and 3D Room Planning
+# Arca: Web-Based System for AI-Assisted Furniture Selection and 3D Room Planning
 
-**Diploma Project** · Astana IT University · 2026–2027
+**Diploma Project** · Astana IT University · Software Engineering, group SE-2420 · 2026–2027
 
-A web application that recommends furniture fitting a user's room, style and budget, explains each recommendation, arranges the furniture automatically without collisions, and lets the user refine the result in an interactive 3D view.
+*Thesis title: Development of a Web-Based System for AI-Assisted Furniture Selection and 3D Room Planning*
+
+Arca is a web application that collects furniture from several Kazakhstan online stores into one catalogue, recommends furniture fitting a user's room, style and budget, explains each recommendation, arranges the furniture automatically without collisions, and lets the user refine the result in an interactive 3D view.
 
 ![Prototype: auto-arranged living room](docs/assets/prototype/03-auto-layout.png)
 
 ## Problem statement
 
-People who buy furniture, especially online, often cannot tell whether an item will fit their room, how to arrange it, or whether the whole set stays within budget. Existing tools either show 3D/AR views without helping to *choose* (Planner 5D, HomeByMe), lock users into one retailer (IKEA Kreativ), or generate attractive images that ignore real dimensions (generative "AI interior" apps). None explains *why* an item is suggested. See [existing systems comparison](docs/existing-systems.md) and [literature review](docs/literature-review.md).
+People who buy furniture, especially online, often cannot tell whether an item will fit their room, how to arrange it, or whether the whole set stays within budget. Existing tools either show 3D/AR views without helping to *choose* (Planner 5D, HomeByMe), lock users into one retailer or brand catalogue (IKEA Kreativ, Roomle), or generate attractive images that ignore real dimensions (generative "AI interior" apps). None explains *why* an item is suggested, and none works with the assortment of local Kazakhstan furniture stores. See [existing systems comparison](docs/existing-systems.md) and [literature review](docs/literature-review.md).
 
 ## Target users
 
 - **Primary:** people furnishing a flat or a room (students, young families, renters) without design experience.
-- **Secondary:** furniture store consultants and interior designers working with clients.
+- **Secondary:** furniture store consultants and interior designers working with clients; local furniture shops that gain 3D visualisation without modelling costs.
 
 Evidence and open assumptions: [docs/relevance-evidence.md](docs/relevance-evidence.md).
 
 ## Expected outcomes
 
-1. A working web system: room setup, explained AI recommendations, automatic valid layout, 3D editing, cost summary, saved projects.
-2. A recommendation engine and layout solver evaluated against baselines (constraint satisfaction, style precision, overlap/clearance rates, latency).
-3. A usability study showing reduced time and higher decision confidence compared with manual planning (SUS ≥ 68).
+1. A working web system on a demo stand: unified catalogue of **≥ 5 000 items** from several local stores, room setup, explained AI recommendations, automatic valid layout, 3D editing, cost summary, saved projects.
+2. Recommendation quality **nDCG@10 above the baseline** (filter by category and price); layouts with **no overlaps and clear walkways**.
+3. A 3D scene of **30+ objects at ≥ 30 FPS** on a mid-range laptop; catalogue search API **p95 < 300 ms**.
+4. A usability study showing reduced time and higher decision confidence compared with manual planning (SUS ≥ 68).
 
 Details: [proposal](docs/proposal.md) · [evaluation plan](docs/evaluation-plan.md).
 
 ## Team and responsibilities
 
-| Member | Responsibility (proposed, see [project management](docs/project-management.md#3-allocation-of-responsibilities)) |
+| Member | Responsibility (see [project management](docs/project-management.md#3-allocation-of-responsibilities)) |
 |--------|--------------------------------------------------|
-| Tamerlan Yessimov | Backend, data model, database, repository & CI, technology comparison |
-| Sultanbek Zhumagali | 3D frontend room editor, UX, existing systems, usability study |
-| Muzaffar Kapezov | AI layer: recommendation engine, layout solver, benchmark; literature review |
+| Tamerlan Yessimov | Team lead; ML developer: AI furniture recommendation service (CLIP embeddings, ranking, natural-language queries, evaluation) |
+| Sultanbek Zhumagali | Backend developer: system architecture and API contracts, Go core API, catalogue parsers and data, database, layout module, infrastructure |
+| Muzaffar Kapezov | Frontend and 3D developer: web client and 3D room planner, UX research and prototypes, 3D assets |
 
 **Supervisor:** Kashkimbayeva Nurzhamal
 
 ## Scope
 
-**In scope:** rectangular rooms with doors; curated catalog (≥ 50 items by M2) with dimensions, styles and prices; rule-based recommendations with explanations; automatic layout with hard constraints (inside room, no overlap, door zone free); browser 3D editor; cost vs. budget; save/load.
+**In scope:** rectangular and L-shaped rooms with doors and windows; unified catalogue (≥ 5 000 items) from several Kazakhstan stores with dimensions, materials, styles, prices and images; parametric 3D models for items without a seller model; recommendations with explanations (CLIP embeddings + constraints, natural-language requests); automatic layout with hard constraints (inside room, no overlap, door zone free); browser 3D editor; cost vs. budget; save/load.
 
 **Out of scope:** photoreal rendering, AR on phones, room scanning, non-rectangular rooms (v1), checkout/payments, training large generative models.
 
@@ -45,28 +48,33 @@ Details: [proposal](docs/proposal.md) · [evaluation plan](docs/evaluation-plan.
 
 | Deliverable | Status |
 |-------------|--------|
-| Proposal, requirements, technology comparison | Drafted ([proposal](docs/proposal.md), [requirements](docs/requirements.md), [technology comparison](docs/technology-comparison.md)) |
-| Literature review (18 + 3 sources) | ✅ [docs/literature-review.md](docs/literature-review.md) |
+| Proposal, requirements, technology comparison | ✅ drafts — [proposal](docs/proposal.md), [requirements](docs/requirements.md), [technology comparison](docs/technology-comparison.md) |
+| Literature review (22 + 3 sources) | ✅ [docs/literature-review.md](docs/literature-review.md) |
 | Existing systems (5 systems × 10 criteria) | ✅ draft; hands-on checks pending — [docs/existing-systems.md](docs/existing-systems.md) |
 | Evidence of relevance | Protocol ready; **interviews to be conducted** — [docs/relevance-evidence.md](docs/relevance-evidence.md) |
 | Architecture and diagrams (context, use case, component) | ✅ [docs/architecture.md](docs/architecture.md), sources in [docs/diagrams/src](docs/diagrams/src) |
+| Database schema | ✅ draft — [docs/database-schema.md](docs/database-schema.md) |
+| First catalogue data (parsers) | ⏳ in progress (DIP-25); prototype uses a 25-item demo catalogue |
 | UX / prototype | ✅ runnable prototype — [docs/ux-prototype.md](docs/ux-prototype.md) |
 | Verification and evaluation plan | ✅ [docs/evaluation-plan.md](docs/evaluation-plan.md) |
 | Project management, risks, backlog | ✅ [docs/project-management.md](docs/project-management.md) |
 | Supervisor feedback | Template ready — [docs/supervisor-feedback.md](docs/supervisor-feedback.md) |
 
-**Prototype works today:** room setup, 3D view, drag/rotate/remove, explained recommendations (25-item demo catalog), auto-layout, live validation, cost summary, save/load (in memory). **Known limitations:** demo catalog with illustrative prices; boxes instead of 3D models; 90° rotations only; projects lost on backend restart; walkway clearance is a soft rule.
+**Prototype works today** (single Python service; the Go core API and Python ML service replace it, see [architecture](docs/architecture.md#prototype-vs-target-architecture)): room setup, 3D view, drag/rotate/remove, explained recommendations (25-item demo catalog), auto-layout, live validation, cost summary, save/load (in memory). **Known limitations:** demo catalog with illustrative prices; boxes instead of 3D models; 90° rotations only; projects lost on backend restart; walkway clearance is a soft rule.
 
 ## Technologies
 
 | Layer | Choice |
 |-------|--------|
-| Frontend | React 18, TypeScript, Vite, three.js via React Three Fiber + drei |
-| Backend | Python 3.11+, FastAPI, Pydantic |
-| Storage | PostgreSQL (+ pgvector) planned; JSON catalog and in-memory projects in the prototype |
-| Interaction | REST/JSON, OpenAPI |
-| Testing | pytest, vitest; Playwright planned for end-to-end |
+| Web client | TypeScript, React, Vite, Three.js via React Three Fiber + drei, glTF/GLB with Draco |
+| Core API | Go (net/http, hexagonal architecture), OpenAPI |
+| ML service | Python, FastAPI, PyTorch, Hugging Face (CLIP), scikit-learn, Jupyter |
+| Catalogue pipeline | Python parsers for Kazakhstan stores (e.g. mebel.kz) |
+| Storage | PostgreSQL + pgvector, Redis, MinIO (S3-compatible) |
+| Infrastructure | Docker Compose, GitHub Actions |
+| Testing | Go tests, pytest, Vitest, Playwright, k6 |
 | Diagrams | Mermaid (editable sources) |
+| Prototype (pre-defense 1) | Python FastAPI single service + React/R3F client |
 
 Justification: [docs/technology-comparison.md](docs/technology-comparison.md).
 
@@ -79,7 +87,7 @@ Justification: [docs/technology-comparison.md](docs/technology-comparison.md).
 ## Repository structure
 
 ```
-backend/            FastAPI service
+backend/            prototype FastAPI service (to be split into Go core API + Python ML service)
   app/              API, recommender, layout solver, geometry, catalog
   data/             demo furniture catalog (JSON)
   tests/            pytest tests
@@ -96,7 +104,7 @@ project-management/ YouTrack backlog import
 
 ## Setup and running
 
-Requirements: Python 3.11+, Node.js 20+.
+Requirements for the prototype: Python 3.11+, Node.js 20+.
 
 ```bash
 # 1. Backend  (http://localhost:8000, API docs at /docs)

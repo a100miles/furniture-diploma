@@ -14,7 +14,7 @@ The options are judged against the needs of this project, not in general:
 | C2 | Fast loading and smooth rendering | Users open the planner from a link; the scene must stay at 30 FPS or more with 30 items | NFR-01, FR-02 |
 | C3 | Integration with a regular web UI and 3D editing tools | Most screens are 2D UI (catalogue, filters, cost summary) around a 3D view where items are added, moved and rotated | FR-01, FR-03, FR-04, FR-09, NFR-03 |
 | C4 | Fit with the team's skills and the diploma timeline | Three developers, one academic year | NFR-06 |
-| C5 | Python interoperability and speed for AI work | Recommendation and layout algorithms are easiest to build with Python libraries; recommendations must return in under 2 s | FR-05, FR-06, FR-07, NFR-02 |
+| C5 | Python interoperability for ML work, and server performance | ML models (CLIP embeddings, ranking) need Python libraries; catalogue search must answer in under 300 ms (p95) and recommendations in under 2 s | FR-05, FR-06, FR-07, NFR-02 |
 | C6 | Licence and cost | Must be free for academic use and deployable on a student budget | — |
 | C7 | Community, documentation, maintenance, security | Reduces risk when the team gets stuck; mature frameworks ship security fixes and auth tooling | NFR-05, NFR-06 |
 | C8 | Data integrity and persistence | Room designs must save and load reliably; catalogue filtering must be exact | FR-04, FR-08 |
@@ -57,35 +57,41 @@ Supporting choices:
 - **Measurements:** the scene uses metres as world units so furniture dimensions from the catalogue map directly to geometry.
 - **Floor-plan view:** a top-down orthographic camera in the same R3F scene gives the 2D plan without a second renderer.
 
-## 3. Backend
+## 3. Server platform
+
+The server side has two different jobs: (1) the **core API** — catalogue search and filtering, users and projects, layout validation and automatic arrangement, which must be fast and reliable under concurrent use; and (2) the **ML part** — image/text embeddings, ranking and natural-language query parsing, which depends on the Python ML ecosystem (PyTorch, Hugging Face, scikit-learn). The options are therefore compared as whole server architectures.
 
 ### 3.1 Options
 
-**FastAPI (Python)** is an asynchronous web framework built on type hints and Pydantic. It generates an OpenAPI specification and interactive docs automatically, validates requests from the same type definitions, and runs AI code in the same process and language as the API.
+**A. Go core API + Python ML service.** The core API is written in Go (standard `net/http`, hexagonal architecture: domain logic separated from HTTP and database adapters). A separate Python FastAPI service hosts the ML models and is called by the core API over an internal REST interface. Go compiles to a single static binary, has built-in concurrency (goroutines) and low, predictable latency; the team's backend developer already has production-style Go projects (REST APIs with PostgreSQL, Redis, S3 storage, gRPC microservices).
 
-**Django (Python)** is a full-stack framework with an ORM, migrations, authentication, and an auto-generated admin panel. With Django REST Framework it serves JSON APIs well. It is heavier and more opinionated, and its async support is newer and less complete than FastAPI's.
+**B. Python FastAPI monolith.** One FastAPI application serves the API and runs the ML code in the same process. Fastest to start and one language, but CPU-heavy model inference and geometry search share the same worker pool as ordinary API requests, and the Python GIL limits CPU parallelism inside a process.
 
-**Node.js (Express, Fastify or NestJS)** keeps the whole system in JavaScript/TypeScript, which allows sharing types between frontend and backend. Its weakness for this project is AI: the mature recommendation, optimisation and machine-learning libraries (NumPy, SciPy, scikit-learn, PyTorch, OR-Tools' best-supported interface) are Python, so a Node backend would need a separate Python service anyway.
+**C. Node.js (NestJS/Fastify) core API + Python ML service.** Same split as A, but the core API is TypeScript, sharing types with the frontend. Node's single-threaded event loop is weaker for CPU-bound geometry checks (collision tests for 30+ objects, layout search), and the team has less backend experience in Node than in Go.
 
 ### 3.2 Comparison
 
-| Criterion | FastAPI | Django + DRF | Node.js |
-|-----------|---------|--------------|---------|
-| C5 Python AI interoperability | Native, same process | Native | Needs a second Python service |
-| API development speed | High; types give validation and docs for free | High for CRUD; more boilerplate for custom logic | High |
-| Built-in admin for catalogue management | No (add SQLAdmin or similar) | Yes, excellent | No |
-| Auth, ORM, migrations | Pick libraries (SQLAlchemy/SQLModel, Alembic, fastapi-users) | Built in | Pick libraries (Prisma, Passport, etc.) |
-| Async for long AI calls (LLM requests, layout solving) | Native async | Partial | Native async |
-| Auto-generated API docs / typed client | OpenAPI built in; TS client can be generated | Via drf-spectacular | Via extra tooling |
-| C4 Team fit | Python; `main.py` already exists in the repo | Python | Matches frontend language |
+| Criterion | A: Go API + Python ML | B: FastAPI monolith | C: Node API + Python ML |
+|-----------|-----------------------|---------------------|-------------------------|
+| C5 Access to Python ML ecosystem | Yes, in the ML service | Yes, same process | Yes, in the ML service |
+| Latency / throughput of catalogue search (NFR: search p95 < 300 ms) | High: compiled, goroutines, low GC pauses | Medium: async I/O fine, CPU work blocks workers | Medium: async I/O fine, CPU work blocks the event loop |
+| CPU-bound layout search and collision checks | Strong: native speed, parallel candidates | Weak without NumPy/vectorisation | Weak without worker threads |
+| Isolation of ML failures and load | Yes: ML service can be restarted or scaled separately; core API degrades to baseline ranking | No: one process | Yes |
+| Deployment | Single static binary + one Python container | One container | Node runtime + Python container |
+| API documentation | OpenAPI written contract-first, served with the API | Generated automatically | Generated (NestJS Swagger) |
+| C4 Team fit | Backend developer's main language; ML lead works only in Python | Python only | Less backend experience in the team |
+| Complexity | Two services and an internal contract | Lowest | Two services |
 
 ### 3.3 Decision
 
-**FastAPI** (FR-05, FR-06, NFR-02, NFR-05, NFR-06), with PostgreSQL as the database (section 4). The deciding factor is that the AI components are the core contribution of the diploma and they live in Python; FastAPI lets the API call them directly without an extra service. Its OpenAPI output also lets the frontend generate a typed TypeScript client, which recovers most of the type-sharing benefit Node would have offered. Django's admin panel is the one feature we give up; a lightweight admin (e.g. SQLAdmin) or a simple seed script covers catalogue management for a prototype.
+**Option A: Go core API (net/http, hexagonal architecture) plus a Python FastAPI ML service.** The deciding factors are the performance targets (catalogue search under 300 ms at p95, interactive layout validation for 30+ objects), the CPU-bound nature of the layout search, and the team's skills: the backend developer works in Go, the ML developer in Python. Splitting the ML service off also lets the core system keep working with the baseline ranking (filter by category and price) if the ML service is unavailable. The extra cost — two services and an internal API contract — is controlled by writing the contract first in OpenAPI and testing both sides against it.
 
 Supporting choices:
 
-- **Deployment:** Docker Compose for local development and the demo (frontend, API, database).
+- **Caching:** Redis for hot catalogue queries and computed recommendation results.
+- **Data collection:** catalogue parsers in Python (requests/BeautifulSoup, respecting `robots.txt` and rate limits) that normalise dimensions, materials, colour and price from Kazakhstan furniture stores (e.g. mebel.kz) and load them into PostgreSQL.
+- **Deployment:** Docker Compose (web client, Go API, ML service, PostgreSQL, Redis, MinIO) for development and the demo stand; GitHub Actions for CI.
+- **Prototype note:** the pre-defense 1 prototype in `backend/` is a single Python FastAPI service written to validate the recommendation and layout ideas quickly. Its recommender becomes the starting point of the ML service; the catalogue, project and layout endpoints are re-implemented in the Go core API (DIP-26, DIP-15).
 
 ## 4. Data storage
 
@@ -107,7 +113,7 @@ The system stores three kinds of data with different shapes: a furniture **catal
 | Saved room designs (nested, evolving structure) | Good via `jsonb` | Excellent | Acceptable (JSON functions) |
 | Vector similarity for style matching | `pgvector`, self-hosted | Atlas Vector Search (managed service) | Extensions only, immature |
 | Concurrent users | Good | Good | Limited (single writer) |
-| Python tooling (FastAPI) | SQLAlchemy/SQLModel, Alembic migrations | Motor/Beanie ODMs | SQLAlchemy |
+| Tooling (Go API, Python ML service) | pgx / sqlc in Go, golang-migrate; SQLAlchemy in Python | Official Go and Python drivers | Go and Python drivers |
 | Operations for a student team | One Docker container | One Docker container | None |
 | C6 Licence | PostgreSQL licence (permissive) | SSPL (source-available) | Public domain |
 
@@ -118,13 +124,16 @@ The system stores three kinds of data with different shapes: a furniture **catal
 Supporting choices:
 
 - **Asset storage:** 3D models and textures are static files in object storage (S3-compatible, e.g. MinIO locally) or a CDN, referenced by URL from catalogue rows, never stored in the database or served through the API.
-- **Schema management:** SQLAlchemy/SQLModel models with Alembic migrations, so schema changes are versioned in the repository.
+- **Schema management:** versioned SQL migrations (golang-migrate) in the repository; the ML service reads the catalogue and writes item embeddings through its own narrow repository layer.
+- **Cache:** Redis in front of PostgreSQL for frequent catalogue queries (TTL-based invalidation on catalogue import).
 
 ## 5. Component interaction
 
 ### 5.1 Options
 
-**REST over HTTP with JSON** exposes resources (`/catalogue/items`, `/designs/{id}`, `/recommendations`, `/layouts`) with standard HTTP methods. FastAPI generates an OpenAPI description from the code, from which a typed TypeScript client can be generated for the frontend.
+There are two interaction boundaries: the browser client ↔ core API, and the core API ↔ ML service.
+
+**REST over HTTP with JSON** exposes resources (`/catalogue/items`, `/designs/{id}`, `/recommendations`, `/layouts`) with standard HTTP methods. An OpenAPI description (written contract-first) is used to generate a typed TypeScript client for the frontend and to test the Go API and the ML service against the same contract.
 
 **GraphQL** exposes one endpoint where the client asks for exactly the fields it needs. It reduces over-fetching for complex, nested screens, but adds a schema layer, resolver code, harder HTTP caching and more tooling on both sides.
 
@@ -135,7 +144,7 @@ Supporting choices:
 | Criterion | REST + JSON | GraphQL | WebSockets |
 |-----------|-------------|---------|------------|
 | Fit with operations (load catalogue, save design, request recommendations or a layout) | Direct mapping | Good, but more machinery than needed | Overkill for request/response |
-| Typed client for the TS frontend | Generated from FastAPI's OpenAPI | Generated from the GraphQL schema | Manual message types |
+| Typed client for the TS frontend | Generated from the OpenAPI contract | Generated from the GraphQL schema | Manual message types |
 | HTTP caching of catalogue and assets | Native (CDN, ETag) | Difficult (single POST endpoint) | None |
 | Long-running AI jobs (LLM call, layout optimisation) | Request with timeout, or a job resource polled by the client; Server-Sent Events for progress | Subscriptions (needs WebSockets anyway) | Native progress streaming |
 | Real-time multi-user editing | Not supported | Via subscriptions | Native |
@@ -143,7 +152,9 @@ Supporting choices:
 
 ### 5.3 Decision
 
-**REST with JSON, documented by OpenAPI** (FR-05, FR-06, FR-08, NFR-06). Every operation in the planned system is a request followed by a response, and REST maps onto them directly with the least code and tooling. The generated OpenAPI client gives the frontend end-to-end types. Catalogue data and 3D assets benefit from ordinary HTTP caching, which GraphQL makes harder. If layout optimisation or LLM calls become slow enough that the user needs progress feedback, a single Server-Sent Events endpoint (or one WebSocket channel) can be added for that case without changing the rest of the API. Real-time collaborative editing is out of scope for the diploma and recorded as future work; it would be the main reason to adopt WebSockets.
+**REST with JSON, documented by OpenAPI, on both boundaries** (FR-05, FR-06, FR-08, NFR-06). Every operation in the planned system is a request followed by a response, and REST maps onto them directly with the least code and tooling. The generated OpenAPI client gives the frontend end-to-end types. Catalogue data and 3D assets benefit from ordinary HTTP caching, which GraphQL makes harder. If layout optimisation or LLM calls become slow enough that the user needs progress feedback, a single Server-Sent Events endpoint (or one WebSocket channel) can be added for that case without changing the rest of the API. Real-time collaborative editing is out of scope for the diploma and recorded as future work; it would be the main reason to adopt WebSockets.
+
+**Core API ↔ ML service.** gRPC was considered for the internal call (smaller payloads, generated stubs in Go and Python; the backend developer has used it). REST/JSON was chosen because there is only one internal client, payloads are small (a candidate list and scores), and the same OpenAPI tooling, logging and curl-based debugging work on both boundaries. If the internal call becomes a measurable bottleneck, switching it to gRPC changes only the adapter in the Go API (hexagonal architecture).
 
 Within the browser, the 2D UI and the 3D scene communicate through a shared client-side store (Zustand, section 7) rather than through events or a bridge, which is one of the reasons for choosing react-three-fiber in section 2.
 
@@ -156,7 +167,7 @@ The system needs two AI capabilities that should be evaluated separately:
 
 ### 6.1 Approach A: rules plus optimisation
 
-**Recommendation:** content-based filtering. Each catalogue item has attributes (category, dimensions, style tags, colour, material, price). The user's preferences become a weighted scoring function; hard filters remove items that do not fit the room or budget. Item embeddings (from text descriptions or images) allow "similar style" matching.
+**Recommendation:** content-based filtering. Each catalogue item has attributes (category, dimensions, style tags, colour, material, price). The user's preferences become a weighted scoring function; hard filters remove items that do not fit the room or budget. Item embeddings from product images and descriptions, computed with open-source CLIP-family models (Radford et al., 2021), allow "similar style" matching and matching to items the user has already chosen.
 
 **Layout:** interior design guidelines are written as cost terms (clearance around furniture, circulation paths, alignment to walls, conversation distance between seats, facing the focal point, visual balance) and hard constraints (inside the room, no overlap, doors and windows clear). An optimiser searches for the arrangement with the lowest cost. This is the approach of Merrell et al. (2011), "Interactive Furniture Layout Using Interior Design Guidelines", and Yu et al. (2011), "Make It Home: Automatic Optimization of Furniture Arrangement", both of which used simulated annealing / Markov chain Monte Carlo search. Constraint solvers (Google OR-Tools CP-SAT) are an alternative for the hard constraints.
 
@@ -195,8 +206,8 @@ Generative models trained on large datasets of designed rooms learn layout patte
 No single approach meets every requirement, so the system combines A and B, each where it is strongest:
 
 1. **Preference understanding (LLM):** the user describes the room and taste in free text or through a short questionnaire. An LLM converts this into a structured preference object (style tags, colour palette, budget, required items, room function) validated against a JSON schema. A questionnaire-only path keeps the system working without the LLM.
-2. **Recommendation (content-based scoring, FR-05):** hard filters (fits the room, within budget) followed by a weighted score combining attribute matches and embedding similarity to the stated style. Embeddings are stored in PostgreSQL with `pgvector`. The output is a ranked shortlist per furniture category, with the score breakdown kept for explanations. Scoring runs in the database and in Python without any LLM call, so it stays well inside the 2 s budget of NFR-02.
-3. **Layout (rules + optimisation, FR-06, FR-07):** the selected items are placed by a cost-function optimiser (simulated annealing seeded by simple heuristics such as "large items against walls first"), with hard constraints for room bounds, overlaps, door swing areas and minimum walkways. The same constraint checks run in the editor whenever the user moves an item, which provides the collision and out-of-bounds validation of FR-07. Following the Holodeck idea, the LLM may optionally propose high-level relations ("desk under the window"), which enter the optimiser as soft cost terms rather than as raw coordinates.
+2. **Recommendation (content-based scoring, FR-05; Python ML service):** hard filters (fits the room, within budget) followed by a weighted score combining attribute matches and CLIP embedding similarity to the stated style and to already selected furniture. Embeddings are stored in PostgreSQL with `pgvector`. Quality is measured with Precision@K and nDCG@10 against the baseline "filter by category and price". The output is a ranked shortlist per furniture category, with the score breakdown kept for explanations. Scoring runs in the database and in the ML service without any LLM call, so it stays well inside the 2 s budget of NFR-02.
+3. **Layout (rules + optimisation, FR-06, FR-07; Go core API):** the selected items are placed by a cost-function optimiser (simulated annealing seeded by simple heuristics such as "large items against walls first"), with hard constraints for room bounds, overlaps, door swing areas and minimum walkways. The same constraint checks run in the editor whenever the user moves an item, which provides the collision and out-of-bounds validation of FR-07. Following the Holodeck idea, the LLM may optionally propose high-level relations ("desk under the window"), which enter the optimiser as soft cost terms rather than as raw coordinates.
 4. **Explanation (LLM, optional):** the score breakdown and the satisfied rules are turned into a short user-facing explanation of why each item was chosen and placed where it is.
 
 Learned models (approach C) are recorded as future work: once the system collects real user designs and feedback, they can serve as training data for a learned layout prior or a collaborative-filtering recommender.
@@ -211,14 +222,17 @@ This design keeps the core behaviour deterministic, explainable and measurable f
 | 3D rendering | Three.js via react-three-fiber + drei | Scene and UI in one state tree; small bundle; editor helpers ready-made |
 | UI state | Zustand | Lightweight store usable from both 2D UI and 3D components (the R3F team's own library) |
 | 3D assets | glTF/GLB with Draco/Meshopt compression | Open standard, works with every engine considered |
-| Backend | FastAPI (Python) | AI code runs in the same language and process; OpenAPI out of the box |
+| Core API | Go (net/http, hexagonal architecture) | Low latency for catalogue search, fast CPU-bound layout checks, team's backend language |
+| ML service | Python, FastAPI, PyTorch, Hugging Face (CLIP), scikit-learn | ML ecosystem; isolated from the core API |
+| Cache | Redis | Hot catalogue queries and recommendation results |
+| Catalogue data | Python parsers for Kazakhstan stores (e.g. mebel.kz) | Local assortment that existing planners do not cover |
 | Database | PostgreSQL + `pgvector` (SQLAlchemy/SQLModel, Alembic) | Relational catalogue, `jsonb` room designs, vector search for style similarity |
-| Asset storage | S3-compatible object storage / CDN | Large model files cached by the browser, kept out of the database |
+| Asset storage | S3-compatible object storage (MinIO) | Images and GLB models kept out of the database, cached by the browser |
 | Frontend–backend interaction | REST + JSON with OpenAPI and a generated TypeScript client | Matches request/response operations; typed end to end; cacheable |
-| Recommendation | Content-based scoring with embeddings | No training data or user history needed; explainable |
+| Recommendation | Content-based scoring with CLIP embeddings + constraints | No user history needed; explainable; measurable with nDCG@10 |
 | Auto-layout | Cost-function optimisation (simulated annealing) with hard constraints | Proven in the literature; guarantees valid layouts; no training |
 | Natural-language layer | LLM API behind a provider interface | Parses free-text preferences and writes explanations; optional at runtime |
-| Deployment | Docker Compose | One command to run the full system for development and the defence demo |
+| Deployment / CI | Docker Compose, GitHub Actions | One command to run the full system; tests on every pull request |
 
 ### Risks and mitigations
 
@@ -243,8 +257,13 @@ This design keeps the core behaviour deterministic, explainable and measurable f
 - react-three-fiber documentation: https://r3f.docs.pmnd.rs/
 - Babylon.js documentation: https://doc.babylonjs.com/
 - Unity Web platform documentation: https://docs.unity3d.com/Manual/webgl.html
+- Radford, A., et al. (2021). Learning Transferable Visual Models From Natural Language Supervision (CLIP). *ICML 2021*.
+- Go documentation: https://go.dev/doc/
 - FastAPI documentation: https://fastapi.tiangolo.com/
-- Django documentation: https://docs.djangoproject.com/
+- NestJS documentation: https://docs.nestjs.com/
+- gRPC documentation: https://grpc.io/docs/
+- Redis documentation: https://redis.io/docs/
+- MinIO documentation: https://min.io/docs/
 - PostgreSQL documentation: https://www.postgresql.org/docs/
 - pgvector: https://github.com/pgvector/pgvector
 - MongoDB documentation: https://www.mongodb.com/docs/

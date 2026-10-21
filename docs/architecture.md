@@ -6,14 +6,28 @@ Diagram sources (editable, [Mermaid](https://mermaid.js.org/)) are in [`diagrams
 
 ## 1. Architectural style
 
-A **client–server web application** with a thin REST boundary:
+Arca is a **distributed web application** with three runtime services and a data pipeline:
 
-- **Frontend (browser):** React single-page application; 3D rendering with three.js through React Three Fiber. Holds the editing state and gives instant feedback (client-side geometry checks while dragging).
-- **Backend:** Python FastAPI service. Owns the catalog, the recommendation engine, the layout solver and the authoritative validation. Stateless per request except for project storage.
-- **Storage:** PostgreSQL for catalog and projects (pgvector later for style embeddings); static/object storage for GLB models. *Prototype: JSON file catalog and in-memory projects; PostgreSQL arrives in DIP-17.*
-- **Interaction:** REST/JSON over HTTPS, documented automatically with OpenAPI at `/docs`.
+- **Web client (browser):** React + TypeScript single-page application; 3D rendering with three.js through React Three Fiber. Holds the editing state and gives instant feedback while dragging (client-side collision checks).
+- **Core API (Go, net/http, hexagonal architecture):** catalogue search, users, rooms and projects, and the **layout module** (placement validation with AABB/OBB collision checks, walkways, doors and windows; constraint-based automatic arrangement). Authoritative for all validation. Documented by an OpenAPI contract.
+- **ML service (Python, FastAPI, PyTorch, Hugging Face):** CLIP image/text embeddings, style-similarity search, ranking under room-size, budget and already-chosen-furniture constraints, parsing of natural-language requests into filters. Called only by the core API; if it is unavailable, the core API falls back to the baseline ranking (filter by category and price).
+- **Catalogue pipeline (Python):** parsers for Kazakhstan furniture stores (e.g. mebel.kz) that respect robots.txt and rate limits, plus normalisation of dimensions, materials, colour and price.
+- **Storage:** PostgreSQL + pgvector (users, rooms, projects, catalogue, embeddings), Redis (query cache), MinIO / S3 (images, GLB models). See [database-schema.md](database-schema.md).
+- **Interaction:** REST/JSON over HTTPS between client and core API; internal REST/JSON between core API and ML service (see `technology-comparison.md` §5).
+- **Infrastructure:** Docker Compose for all services, GitHub Actions CI, demo stand.
 
-The "AI" components (recommendation engine, layout solver, optional natural-language adapter) sit behind narrow interfaces (`recommend(request)`, `auto_layout(request)`) so a learned or LLM-based model can replace the rule-based v1 without touching the API or the frontend (see `literature-review.md` §3.1).
+### Prototype vs. target architecture
+
+The pre-defense 1 prototype (`backend/`, `frontend/`) deliberately runs as **one Python service** so that the recommendation and layout ideas could be tried end to end before the services are split:
+
+| Prototype module (`backend/app/`) | Target location |
+|-----------------------------------|-----------------|
+| `recommender.py` | ML service (rule-based scorer becomes the baseline + feature set for the CLIP ranker) |
+| `layout.py`, `geometry.py` | Core API layout module (Go) — DIP-15, DIP-19 |
+| `catalog.py`, `data/catalog.json` | Core API catalogue service + PostgreSQL, filled by the parsers — DIP-25, DIP-26 |
+| project endpoints in `main.py` | Core API projects service + PostgreSQL — DIP-17 |
+
+The REST contract of the prototype (`/api/catalog`, `/api/recommendations`, `/api/layout`, `/api/validate`, `/api/projects`) is kept, so the web client does not change when the backend is replaced.
 
 ## 2. System context
 
@@ -23,10 +37,11 @@ The "AI" components (recommendation engine, layout solver, optional natural-lang
 |----------------|-------------|
 | Home user | Main user. Enters room and preferences, receives recommendations, arranges furniture in 3D. |
 | Interior designer / seller | Uses the same functions with a client. |
-| Catalog administrator | Maintains items, prices and 3D models (import in prototype; admin UI later). |
-| Furniture retailer data (external) | Source of product data (dimensions, prices) via CSV/JSON import. |
+| Catalog administrator | Runs catalogue imports, fixes data, uploads 3D models. |
+| Kazakhstan online furniture stores (external) | Source of product data (dimensions, materials, colour, prices, images), collected by our parsers. |
 | 3D model sources (external) | GLB models from retailers or CC0 libraries; licence recorded per model. |
-| LLM API (external, optional) | Converts free-text wishes into layout constraints (DIP-24). The system works fully without it. |
+| Open-source ML models (external) | CLIP-family model weights from Hugging Face, downloaded once and run inside the ML service. |
+| LLM API (external, optional) | Parses free-text requests into structured filters when the local parser is not enough (DIP-29). The system works fully without it. |
 
 ## 3. Use cases
 
@@ -44,7 +59,8 @@ The "AI" components (recommendation engine, layout solver, optional natural-lang
 | UC-08 | View cost summary vs. budget | User | FR-09 | ✅ |
 | UC-09 | Save / load project | User | FR-08 | ✅ in-memory (DIP-17 adds DB) |
 | UC-10 | Describe wishes in natural language | User, LLM API | (Could) | ⏳ DIP-24 |
-| UC-11 | Manage catalog | Admin | — | ⏳ JSON file for now |
+| UC-11 | Manage catalog | Admin | FR-29, FR-31 | ⏳ JSON file for now |
+| UC-12 | Find items similar to chosen furniture | User | FR-36 | ⏳ needs CLIP embeddings (DIP-28) |
 
 ### Main scenario: UC-04 + UC-06 "Furnish my living room"
 
@@ -62,32 +78,35 @@ The "AI" components (recommendation engine, layout solver, optional natural-lang
 
 ![Component diagram](diagrams/export/03-component.svg)
 
-| Component | Responsibility | Code |
-|-----------|----------------|------|
-| Room setup & panels UI | Forms for room and preferences; recommendation cards with reasons; catalog list; cost summary | `frontend/src/components/RoomForm.tsx`, `RecommendationPanel.tsx`, `CatalogPanel.tsx`, `CostSummary.tsx` |
-| 3D Room Editor | Scene, walls, floor grid, door zones, furniture meshes, drag/rotate, invalid highlight | `frontend/src/components/Scene.tsx` |
-| Project state store | Room, placed items, selection (React state in v1) | `frontend/src/App.tsx` |
-| Client geometry | Instant validation and snapping while dragging (mirror of backend rules) | `frontend/src/lib/geometry.ts` |
-| API client | Typed calls to the REST API | `frontend/src/lib/api.ts` |
-| REST API layer | Routing, schema validation (Pydantic), OpenAPI | `backend/app/main.py`, `models.py` |
-| Catalog service | Load and filter furniture | `backend/app/catalog.py` |
-| Recommendation engine | Hard constraints, weighted scoring, explanations, budget bundle | `backend/app/recommender.py` |
-| Layout solver | Candidate generation and guideline scoring, greedy placement | `backend/app/layout.py` |
-| Geometry & validation | Footprints, overlap, bounds, door zone | `backend/app/geometry.py` |
-| Project service | Save/load projects | `backend/app/main.py` (in-memory) |
+| Component | Responsibility | Owner | Prototype code |
+|-----------|----------------|-------|----------------|
+| Pages | Catalogue, product card, account with projects | Muzaffar | `frontend/src/components/CatalogPanel.tsx` (catalogue list) |
+| 3D Room Editor | Room, doors/windows, drag/rotate, wall snapping, top-down and free camera, invalid highlight | Muzaffar | `frontend/src/components/Scene.tsx` |
+| Asset loader | GLB + Draco, LOD, parametric models from dimensions | Muzaffar | boxes from dimensions in `Scene.tsx` |
+| State store / API client | Room, placed items, selection; typed REST calls | Muzaffar | `frontend/src/App.tsx`, `src/lib/api.ts`, `src/lib/geometry.ts` |
+| HTTP adapter | REST handlers, auth, OpenAPI contract | Sultanbek | `backend/app/main.py` |
+| Catalogue service | Search and filters over PostgreSQL (+ Redis cache) | Sultanbek | `backend/app/catalog.py` |
+| Projects service | Users, rooms, projects, placements | Sultanbek | in-memory store in `main.py` |
+| Layout module | Collision checks (AABB/OBB), walkways, doors, windows; constraint-based auto-layout | Sultanbek | `backend/app/geometry.py`, `layout.py` |
+| Recommendation port | Calls the ML service; baseline fallback | Sultanbek | — |
+| Catalogue pipeline | Store parsers, normalisation, deduplication | Sultanbek | — (DIP-25) |
+| ML API / Ranker | Ranking under room, budget and chosen-furniture constraints; explanations | Tamerlan | `backend/app/recommender.py` (rule-based baseline) |
+| Embedding module | CLIP image and text vectors stored in pgvector | Tamerlan | — (DIP-28) |
+| Query parser | Free text → structured filters | Tamerlan | — (DIP-29) |
 
-## 5. Data model (initial)
+## 5. Data model
+
+The full draft schema is in [database-schema.md](database-schema.md) (ER diagram with editable source). Core entities:
 
 ```
-FurnitureItem(id, name, category, styles[], width, depth, height, price, color, against_wall, [model_url])
-Room(width, length, height, doors[Door(wall, offset, width)])
-Placement(item_id, x, z, rotation ∈ {0, 90, 180, 270})
-Project(id, name, room, placements[], style, budget)
+FurnitureItem(id, store, category, external_id, name, width_cm, depth_cm, height_cm, price_kzt, material, color, styles[], images[], model, embedding)
+Room(id, user, room_type, floor_polygon, height_cm, openings[Door|Window])
+Project(id, user, room, styles, budget_kzt, placements[Placement(item, x_cm, z_cm, rotation_deg, locked)])
 ```
 
-Coordinates: floor rectangle [0, width] × [0, length] in metres; rotation 0° means the item's front faces +z (back against the z = 0 wall), matching three.js `rotation.y`.
+Coordinates: floor in the room's plane, x to the right and z towards the viewer; rotation 0° means the item's front faces +z, matching three.js `rotation.y`. The prototype uses metres; the database stores centimetres.
 
-## 6. API (prototype)
+## 6. API (prototype contract, kept by the core API)
 
 | Method & path | Purpose | Requirement |
 |---------------|---------|-------------|
@@ -120,7 +139,8 @@ Example request/response pairs are in [`ux-prototype.md`](ux-prototype.md#api-ex
 
 | ADR | Decision | Reason | Alternatives (see `technology-comparison.md`) |
 |-----|----------|--------|-------------------------------------|
-| ADR-1 | Rule-based recommender and layout first; ML/LLM later behind same interface | No training data or user history (cold start); validity and explainability required | Learned scene synthesis (ATISS, DiffuScene), LLM-only |
-| ADR-2 | Hard constraints enforced by a deterministic solver, never by the AI proposal itself | Generative methods do not guarantee validity | Trust model output, post-filter |
-| ADR-3 | Validation duplicated client-side for instant feedback; backend is authoritative | Dragging needs < 16 ms feedback | Server-only validation |
-| ADR-4 | Axis-aligned footprints with 90° rotation in v1 | Simpler, exact geometry; covers most real layouts | Free rotation with oriented boxes (later) |
+| ADR-1 | Split into Go core API and Python ML service | Performance targets (search p95 < 300 ms, CPU-bound layout checks); ML needs Python; team skills | FastAPI monolith, Node API |
+| ADR-2 | Rule-based baseline first; CLIP-based ranker replaces it behind the same interface and is compared to it | No user history (cold start); a baseline is required for the evaluation | Collaborative filtering, LLM-only |
+| ADR-3 | Hard constraints enforced by a deterministic solver, never by the AI proposal itself | Generative methods do not guarantee validity | Trust model output, post-filter |
+| ADR-4 | Validation duplicated client-side for instant feedback; backend is authoritative | Dragging needs < 16 ms feedback | Server-only validation |
+| ADR-5 | Axis-aligned boxes (AABB) with 90° rotation in v1, oriented boxes (OBB) for free rotation later | Simpler, exact geometry first; OBB when free rotation is added | Mesh-level collision |
