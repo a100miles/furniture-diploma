@@ -7,7 +7,7 @@
 | Item | Link |
 |------|------|
 | Git repository | https://github.com/a100miles/furniture-diploma |
-| YouTrack project (key `DIP`) | **TODO: paste the YouTrack project URL here** |
+| YouTrack project (key `DIP`) | https://furniture-diploma.youtrack.cloud/projects/DIP |
 | Backlog import file | [`project-management/youtrack-backlog.csv`](../project-management/youtrack-backlog.csv) |
 
 **YouTrack setup (one-time).** Create project with key `DIP`, add all three team members and the supervisor, then *Import → CSV* the backlog file (columns map to Summary, Assignee, Priority, Due Date, Description). Task numbers will then match the IDs used in this repository (DIP-1 … DIP-31). For each task add the acceptance criteria from the CSV and, when done, a link to the pull request.
