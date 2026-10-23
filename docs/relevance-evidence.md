@@ -107,7 +107,7 @@ New requirements or changes suggested:
 These are published findings, not our own data, and are cited as such:
 
 - Size and fit uncertainty is the main barrier that AR furniture tools address (Öztürkcan, 2021).
-- Interactive visualisation increases enjoyment and purchase intention, but a plain website was rated more useful (Kowalczuk et al., 2021) — suggesting decision support matters, not just 3D.
+- The effect of an AR shopping experience on purchase intention is explained through perceived usefulness and ease of use (Guo & Zhang, 2024, PLOS ONE): decision support matters, not just 3D.
 - Major retailers (IKEA Kreativ) and planners (Planner 5D) invest in AI room tools, indicating market demand (see `existing-systems.md`).
 
 ## 8. Assumption register
@@ -118,4 +118,4 @@ Statements used in the proposal that are **not yet verified** by our own evidenc
 |------------|---------|---------------|
 | H1–H6 above | proposal, requirements | Interviews P1–P5 |
 | Target users have a laptop or desktop browser with WebGL | NFR-04 | Interview Q7 + browser stats |
-| A curated catalog of ~50 items is enough to demonstrate value | scope | Supervisor feedback, usability test |
+| Local store websites give enough data (dimensions, price, photo) for ≥ 5 000 usable items | scope, FR-31 | First parser run report (DIP-25) |

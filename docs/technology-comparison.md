@@ -238,7 +238,7 @@ This design keeps the core behaviour deterministic, explainable and measurable f
 
 | Risk | Mitigation |
 |------|------------|
-| Few free, correctly scaled 3D furniture models | Start with a small curated catalogue (CC0 sources such as Poly Haven, or simple parametric models generated in code); keep real dimensions as data separate from the mesh |
+| Few free, correctly scaled 3D furniture models | Generate simple parametric models from catalogue dimensions (FR-57); use CC0 models (e.g. Poly Haven) for key items; keep real dimensions as data separate from the mesh |
 | Layout optimiser gives unnatural results | Tune weights against a small set of hand-made reference rooms; let users lock items and re-run |
 | LLM cost, latency or unavailability (an LLM call alone can exceed the NFR-02 budget) | LLM kept out of the recommendation path; used only for parsing free text and writing explanations, which load after the results; cache results; questionnaire and template fallbacks |
 | Performance on weak laptops and phones (NFR-01) | Compressed assets, instancing, on-demand rendering (`frameloop="demand"` in R3F), simplified shadows |
