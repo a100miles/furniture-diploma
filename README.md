@@ -49,7 +49,7 @@ Details: [proposal](docs/proposal.md) · [evaluation plan](docs/evaluation-plan.
 | Deliverable | Status |
 |-------------|--------|
 | Proposal, requirements, technology comparison | ✅ drafts — [proposal](docs/proposal.md), [requirements](docs/requirements.md), [technology comparison](docs/technology-comparison.md) |
-| Literature review (22 + 3 sources) | ✅ [docs/literature-review.md](docs/literature-review.md) |
+| Literature review (24 scientific papers + 2 technical sources, all open access) | ✅ [docs/literature-review.md](docs/literature-review.md) |
 | Existing systems (5 systems × 10 criteria) | ✅ draft; hands-on checks pending — [docs/existing-systems.md](docs/existing-systems.md) |
 | Evidence of relevance | Protocol ready; **interviews to be conducted** — [docs/relevance-evidence.md](docs/relevance-evidence.md) |
 | Architecture and diagrams (context, use case, component) | ✅ [docs/architecture.md](docs/architecture.md), sources in [docs/diagrams/src](docs/diagrams/src) |
@@ -131,7 +131,7 @@ cd frontend && npm run build  # type check + production build
 
 ## Contributing
 
-- Branch per YouTrack task: `DIP-<n>-short-name`; commit messages start with `DIP-<n>:`.
+- Branch per YouTrack task: `DIP-<n>-short-name`; use Conventional Commits with the ticket in a `Refs: DIP-<n>` footer (see [AGENTS.md](AGENTS.md)).
 - Open a pull request explaining the change, the task, and how it was checked; another team member reviews before merging into `main`.
 - Never commit secrets or personal data: use `.env` (ignored) based on `.env.example`.
 - Pre-defense submissions are tagged `pre-defense-1`, `pre-defense-2`, `final-pre-defense`.
