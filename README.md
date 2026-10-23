@@ -54,7 +54,7 @@ Details: [proposal](docs/proposal.md) · [evaluation plan](docs/evaluation-plan.
 | Evidence of relevance | Protocol ready; **interviews to be conducted** — [docs/relevance-evidence.md](docs/relevance-evidence.md) |
 | Architecture and diagrams (context, use case, component) | ✅ [docs/architecture.md](docs/architecture.md), sources in [docs/diagrams/src](docs/diagrams/src) |
 | Database schema | ✅ draft — [docs/database-schema.md](docs/database-schema.md) |
-| First catalogue data (parsers) | ⏳ in progress (DIP-25); prototype uses a 25-item demo catalogue |
+| First catalogue data (parsers) | ✅ mebel.kz parser: 4 084 items in 10 categories — [pipeline/](pipeline); second store pending; prototype still uses a 25-item demo catalogue |
 | UX / prototype | ✅ runnable prototype — [docs/ux-prototype.md](docs/ux-prototype.md) |
 | Verification and evaluation plan | ✅ [docs/evaluation-plan.md](docs/evaluation-plan.md) |
 | Project management, risks, backlog | ✅ [docs/project-management.md](docs/project-management.md) |
@@ -91,6 +91,10 @@ backend/            prototype FastAPI service (to be split into Go core API + Py
   app/              API, recommender, layout solver, geometry, catalog
   data/             demo furniture catalog (JSON)
   tests/            pytest tests
+pipeline/           catalogue parsers for Kazakhstan stores (Python)
+  catalog_pipeline/ fetcher (robots.txt, rate limit), normalisation, store parsers
+  data/             parsed catalogue (JSON) + import report
+  tests/            pytest tests
 frontend/           React + three.js 3D editor
   src/components/   UI and 3D scene
   src/lib/          API client, types, geometry (+ vitest tests)
@@ -125,6 +129,7 @@ The frontend dev server proxies `/api` to the backend. Configuration options are
 
 ```bash
 cd backend && pytest          # 35 tests: geometry, recommender, layout, API
+cd pipeline && pytest         # catalogue parser and robots.txt tests
 cd frontend && npm test       # client geometry tests
 cd frontend && npm run build  # type check + production build
 ```

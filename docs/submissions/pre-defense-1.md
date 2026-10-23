@@ -21,7 +21,7 @@
 - Conduct and record 3–5 interviews (DIP-4); update requirements with findings.
 - Supervisor review and feedback log (DIP-12).
 - Populate YouTrack and link tasks to PRs (DIP-11).
-- First catalogue data from local store parsers (DIP-25).
+- Second store parser and 5 000+ items (DIP-25, FR-31); mebel.kz parser done with 4 084 items, not yet loaded into the prototype API.
 - Next milestone: PostgreSQL persistence (DIP-17), 3D models (DIP-18), clearance constraints (DIP-19), benchmark (DIP-20).
 
 ## Tamerlan's one-minute ML explanation

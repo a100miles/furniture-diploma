@@ -1,0 +1,27 @@
+{
+ "store": "mebel_kz",
+ "started_at": "2026-10-23T17:11:41+00:00",
+ "finished_at": "2026-10-23T17:28:32+00:00",
+ "requests": 497,
+ "product_pages_fetched": 374,
+ "delay_s": 2.0,
+ "rows_seen": 4125,
+ "items": 4084,
+ "rows_rejected": 41,
+ "rejected_by_reason": {
+  "missing_dimensions": 30,
+  "implausible_dimensions": 11
+ },
+ "items_by_category": {
+  "sofa": 1058,
+  "armchair": 284,
+  "office_chair": 85,
+  "bed": 468,
+  "coffee_table": 173,
+  "nightstand": 251,
+  "wardrobe": 669,
+  "bookshelf": 401,
+  "desk": 299,
+  "tv_stand": 396
+ }
+}
