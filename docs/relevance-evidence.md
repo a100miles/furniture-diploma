@@ -60,6 +60,8 @@ If a furniture retailer agrees to provide catalog data or to pilot the tool, rec
 
 ## 4. Interview records
 
+Full transcripts of the recorded interviews (P1–P5) are in [`interview-transcripts.md`](interview-transcripts.md).
+
 Copy this block for each participant.
 
 ```
