@@ -89,7 +89,7 @@ The REST contract of the prototype (`/api/catalog`, `/api/recommendations`, `/ap
 | Projects service | Users, rooms, projects, placements | Sultanbek | in-memory store in `main.py` |
 | Layout module | Collision checks (AABB/OBB), walkways, doors, windows; constraint-based auto-layout | Sultanbek | `backend/app/geometry.py`, `layout.py` |
 | Recommendation port | Calls the ML service; baseline fallback | Sultanbek | — |
-| Catalogue pipeline | Store parsers, normalisation, deduplication | Sultanbek | — (DIP-25) |
+| Catalogue pipeline | Store parsers, normalisation, deduplication | Sultanbek | `pipeline/catalog_pipeline/` (mebel.kz parser) |
 | ML API / Ranker | Ranking under room, budget and chosen-furniture constraints; explanations | Tamerlan | `backend/app/recommender.py` (rule-based baseline) |
 | Embedding module | CLIP image and text vectors stored in pgvector | Tamerlan | — (DIP-28) |
 | Query parser | Free text → structured filters | Tamerlan | — (DIP-29) |
