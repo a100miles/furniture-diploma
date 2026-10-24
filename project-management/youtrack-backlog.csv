@@ -14,7 +14,7 @@ DIP-12,Supervisor review of pre-defense 1 package,Tamerlan Yessimov,Critical,202
 DIP-13,Prototype API: catalogue and recommendation endpoints,Sultanbek Zhumagali,High,2026-10-23,"Acceptance criteria: `/api/catalog`, `/api/recommendations` with tests passing"
 DIP-14,3D room editor prototype,Muzaffar Kapezov,High,2026-10-23,"Acceptance criteria: Room setup, add/move/rotate/remove furniture in 3D"
 DIP-15,Layout module v1: validation and rule-based auto-layout,Sultanbek Zhumagali,High,2026-10-23,Acceptance criteria: No overlaps/out-of-bounds on test rooms; unit tests
-DIP-16,Tag `pre-defense-1` and submission summary,Tamerlan Yessimov,Critical,2026-10-24,Acceptance criteria: Tag on reviewed `main`; summary with limitations and open tasks
+DIP-16,Tag `prob-period-1` and matching submission summary,Tamerlan Yessimov,Critical,2026-10-24,Acceptance criteria: Tag points to reviewed `main`; summary matches the tagged snapshot and records open tasks
 DIP-17,"PostgreSQL persistence for users, rooms, projects (FR-08)",Sultanbek Zhumagali,High,2026-11-30,Acceptance criteria: Projects persist across restarts; versioned migrations
 DIP-18,glTF/GLB models with Draco and LOD,Muzaffar Kapezov,High,2026-11-30,Acceptance criteria: Models load < 1 s each; licences recorded
 DIP-19,"Walkways, door and window constraints in layout (FR-39, FR-40)",Sultanbek Zhumagali,High,2026-11-30,Acceptance criteria: Clearance violation rate ≤ 5 % on benchmark

@@ -8,7 +8,7 @@ Transcripts of five user interviews about choosing furniture and planning room l
 
 **Limitations.** Whisper tends to drop fillers ("um", "uh"), false starts and repeated words, so this is close to, but not strictly, verbatim. Marked uncertainties should be checked against the audio.
 
-**Anonymity.** As agreed in the consent statement, participants are identified only as P1–P5. Names and the audio files are not stored in the repository.
+**Privacy and consent record.** The interviewer introduced the sessions as voluntary and said responses would be anonymous. The supplied transcripts preserve an explicit agreement to anonymous notes for P3; individual yes/no consent confirmations are not recorded for P1, P2, P4, or P5. Participants are identified here as P1–P5, and names and audio files are not stored in the repository. See the participant and record audit in [relevance-evidence.md](relevance-evidence.md).
 
 | ID | Recording length | Notes |
 |----|------------------|-------|
