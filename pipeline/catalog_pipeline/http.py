@@ -1,7 +1,10 @@
 """HTTP fetcher that obeys robots.txt and a fixed request rate."""
 
 import logging
+import math
 import time
+from datetime import timezone
+from email.utils import parsedate_to_datetime
 from urllib.parse import urlsplit
 
 import requests
@@ -46,7 +49,9 @@ class PoliteFetcher:
             response = self.session.get(url, timeout=self.timeout)
             self.requests_made += 1
             if response.status_code in (429, 500, 502, 503, 504) and attempt < self.retries:
-                pause = _retry_after(response) or 10.0 * (attempt + 1)
+                pause = _retry_after(response)
+                if pause is None:
+                    pause = 10.0 * (attempt + 1)
                 log.warning("%s returned %s, retrying in %.0f s", url, response.status_code, pause)
                 time.sleep(pause)
                 continue
@@ -62,7 +67,18 @@ class PoliteFetcher:
 
 
 def _retry_after(response: requests.Response) -> float | None:
-    try:
-        return float(response.headers["Retry-After"])
-    except (KeyError, ValueError):
+    value = response.headers.get("Retry-After")
+    if value is None:
         return None
+    try:
+        seconds = float(value)
+    except ValueError:
+        try:
+            retry_at = parsedate_to_datetime(value)
+            # The obsolete asctime HTTP-date format has no explicit timezone.
+            if retry_at.tzinfo is None:
+                retry_at = retry_at.replace(tzinfo=timezone.utc)
+            return max(0.0, retry_at.timestamp() - time.time())
+        except (TypeError, ValueError, OverflowError, OSError):
+            return None
+    return seconds if math.isfinite(seconds) and seconds >= 0 else None
