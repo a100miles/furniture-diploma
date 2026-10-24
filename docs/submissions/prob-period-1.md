@@ -3,7 +3,7 @@
 | Item | Value |
 |------|-------|
 | Repository | https://github.com/a100miles/furniture-diploma |
-| Tag | `prob-period-1` (reviewed `main` snapshot) |
+| Tag | `prob-period-1` (committee snapshot) |
 | YouTrack | https://furniture-diploma.youtrack.cloud/projects/DIP |
 
 ## Completed work

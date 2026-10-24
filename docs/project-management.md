@@ -61,7 +61,7 @@ Integration is through shared API contracts and cross-review of pull requests.
 | DIP-13 | Prototype API: catalogue and recommendation endpoints | Sultanbek | High | 23 Oct | `/api/catalog`, `/api/recommendations` with tests passing |
 | DIP-14 | 3D room editor prototype | Muzaffar | High | 23 Oct | Room setup, add/move/rotate/remove furniture in 3D |
 | DIP-15 | Layout module v1: validation and rule-based auto-layout | Sultanbek | High | 23 Oct | No overlaps/out-of-bounds on test rooms; unit tests |
-| DIP-16 | Tag `prob-period-1` and matching submission summary | Tamerlan | Critical | 24 Oct | Tag points to reviewed `main`; summary matches the tagged snapshot and records open tasks |
+| DIP-16 | Tag `prob-period-1` and matching submission summary | Tamerlan | Critical | 24 Oct | Tag points to the committee snapshot; summary matches the tagged tree and records open tasks |
 | DIP-17 | PostgreSQL persistence for users, rooms, projects (FR-08) | Sultanbek | High | Nov | Projects persist across restarts; versioned migrations |
 | DIP-18 | glTF/GLB models with Draco and LOD | Muzaffar | High | Nov | Models load < 1 s each; licences recorded |
 | DIP-19 | Walkways, door and window constraints in layout (FR-39, FR-40) | Sultanbek | High | Nov | Clearance violation rate ≤ 5 % on benchmark |
