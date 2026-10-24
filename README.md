@@ -44,17 +44,17 @@ Details: [proposal](docs/proposal.md) · [evaluation plan](docs/evaluation-plan.
 
 **Out of scope:** photoreal rendering, AR on phones, room scanning, non-rectangular rooms (v1), checkout/payments, training large generative models.
 
-## Current status (pre-defense 1, 24 October 2026)
+## Current status (probation period 1 snapshot, 24 October 2026)
 
 | Deliverable | Status |
 |-------------|--------|
 | Proposal, requirements, technology comparison | ✅ drafts — [proposal](docs/proposal.md), [requirements](docs/requirements.md), [technology comparison](docs/technology-comparison.md) |
 | Literature review (24 scientific papers + 2 technical sources, all open access) | ✅ [docs/literature-review.md](docs/literature-review.md) |
 | Existing systems (5 systems × 10 criteria) | ✅ draft; hands-on checks pending — [docs/existing-systems.md](docs/existing-systems.md) |
-| Evidence of relevance | Protocol ready; **interviews to be conducted** — [docs/relevance-evidence.md](docs/relevance-evidence.md) |
+| Evidence of relevance | Five interviews transcribed and analysed; findings are preliminary, with participant profile, interview date, and consent-record gaps documented — [docs/relevance-evidence.md](docs/relevance-evidence.md) |
 | Architecture and diagrams (context, use case, component) | ✅ [docs/architecture.md](docs/architecture.md), sources in [docs/diagrams/src](docs/diagrams/src) |
 | Database schema | ✅ draft — [docs/database-schema.md](docs/database-schema.md) |
-| First catalogue data (parsers) | ✅ mebel.kz parser: 4 084 items in 10 categories — [pipeline/](pipeline); second store pending; prototype still uses a 25-item demo catalogue |
+| First catalogue data (parsers) | ✅ mebel.kz parser: 4,084 items in 10 categories — [pipeline/](pipeline); second store and 5,000-item target remain for the MVP checkpoint; prototype still uses a 25-item demo catalogue |
 | UX / prototype | ✅ runnable prototype — [docs/ux-prototype.md](docs/ux-prototype.md) |
 | Verification and evaluation plan | ✅ [docs/evaluation-plan.md](docs/evaluation-plan.md) |
 | Project management, risks, backlog | ✅ [docs/project-management.md](docs/project-management.md) |
@@ -74,7 +74,7 @@ Details: [proposal](docs/proposal.md) · [evaluation plan](docs/evaluation-plan.
 | Infrastructure | Docker Compose, GitHub Actions |
 | Testing | Go tests, pytest, Vitest, Playwright, k6 |
 | Diagrams | Mermaid (editable sources) |
-| Prototype (pre-defense 1) | Python FastAPI single service + React/R3F client |
+| Prototype (probation period 1) | Python FastAPI single service + React/R3F client |
 
 Justification: [docs/technology-comparison.md](docs/technology-comparison.md).
 
@@ -139,4 +139,4 @@ cd frontend && npm run build  # type check + production build
 - Branch per YouTrack task: `DIP-<n>-short-name`; use Conventional Commits with the ticket in a `Refs: DIP-<n>` footer (see [AGENTS.md](AGENTS.md)).
 - Open a pull request explaining the change, the task, and how it was checked; another team member reviews before merging into `main`.
 - Never commit secrets or personal data: use `.env` (ignored) based on `.env.example`.
-- Pre-defense submissions are tagged `pre-defense-1`, `pre-defense-2`, `final-pre-defense`.
+- Current committee snapshot: [`prob-period-1`](docs/submissions/prob-period-1.md). Future snapshot tag names will be agreed for each checkpoint.

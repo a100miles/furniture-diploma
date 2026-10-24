@@ -22,7 +22,7 @@
 - Weekly team meeting with the supervisor (in person or MS Teams): review of completed tasks, demo, agreement on next steps; comments and decisions recorded in `supervisor-feedback.md`.
 - Two-week iterations in YouTrack; every task has an owner, expected result, acceptance criteria and deadline.
 - If the plan slips, tasks are redistributed at the next weekly meeting; the riskiest parts (data quality, 3D performance, recommendation accuracy) are prototyped early.
-- Each pre-defense submission is tagged: `pre-defense-1`, `pre-defense-2`, `final-pre-defense`. Tags are never moved.
+- The current committee snapshot is tagged `prob-period-1`. Give each future snapshot a new immutable tag, with its name agreed before that checkpoint.
 
 ## 3. Allocation of responsibilities
 
@@ -61,7 +61,7 @@ Integration is through shared API contracts and cross-review of pull requests.
 | DIP-13 | Prototype API: catalogue and recommendation endpoints | Sultanbek | High | 23 Oct | `/api/catalog`, `/api/recommendations` with tests passing |
 | DIP-14 | 3D room editor prototype | Muzaffar | High | 23 Oct | Room setup, add/move/rotate/remove furniture in 3D |
 | DIP-15 | Layout module v1: validation and rule-based auto-layout | Sultanbek | High | 23 Oct | No overlaps/out-of-bounds on test rooms; unit tests |
-| DIP-16 | Tag `pre-defense-1` and submission summary | Tamerlan | Critical | 24 Oct | Tag on reviewed `main`; summary with limitations and open tasks |
+| DIP-16 | Tag `prob-period-1` and matching submission summary | Tamerlan | Critical | 24 Oct | Tag points to reviewed `main`; summary matches the tagged snapshot and records open tasks |
 | DIP-17 | PostgreSQL persistence for users, rooms, projects (FR-08) | Sultanbek | High | Nov | Projects persist across restarts; versioned migrations |
 | DIP-18 | glTF/GLB models with Draco and LOD | Muzaffar | High | Nov | Models load < 1 s each; licences recorded |
 | DIP-19 | Walkways, door and window constraints in layout (FR-39, FR-40) | Sultanbek | High | Nov | Clearance violation rate ≤ 5 % on benchmark |
@@ -82,9 +82,9 @@ Integration is through shared API contracts and cross-review of pull requests.
 
 | Milestone | Target date | Content |
 |-----------|-------------|---------|
-| M1 · Pre-defense 1 | **24 Oct 2026** | Proposal and scope, literature review, existing systems and technology comparison, requirements with acceptance criteria, context / use case / component diagrams, database schema, UI prototypes, evaluation plan, first catalogue data; tag `pre-defense-1` |
-| M2 · Pre-defense 2 (MVP) | per university schedule | Catalogue (≥ 5 000 items), 3D editor, basic layout, first version of recommendations; tag `pre-defense-2` |
-| M3 · Final pre-defense | per university schedule | Full system, test results and metrics, thesis text; tag `final-pre-defense` |
+| M1 · Pre-defense 1 | **24 Oct 2026** | Proposal and scope, literature review, existing systems and technology comparison, requirements with acceptance criteria, context / use case / component diagrams, database schema, UI prototypes, evaluation plan, first catalogue data; snapshot tag `prob-period-1` |
+| M2 · Pre-defense 2 (MVP) | per university schedule | Catalogue (≥ 5 000 items), 3D editor, basic layout, first version of recommendations; tag name to be agreed before the checkpoint |
+| M3 · Final pre-defense | per university schedule | Full system, test results and metrics, thesis text; tag name to be agreed before the checkpoint |
 
 ## 6. Risks
 
