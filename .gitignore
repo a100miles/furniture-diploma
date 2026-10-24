@@ -25,3 +25,7 @@ Thumbs.db
 
 # Personal data from interviews must never be committed
 docs/interviews/raw/
+
+# Local agent guidance is not part of committee snapshots
+/AGENTS.md
+/CLAUDE.md
