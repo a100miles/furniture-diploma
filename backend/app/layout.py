@@ -10,6 +10,8 @@ Rotation convention (matches three.js rotation.y): at 0° an item's front faces
 +z; 90° faces +x; 180° faces -z; 270° faces -x.
 """
 
+import csv
+import io
 import math
 from dataclasses import dataclass
 
@@ -207,3 +209,15 @@ def auto_layout(request: LayoutRequest) -> LayoutResponse:
 
     placements = [p.placement for p in placed]
     return LayoutResponse(placements=placements, unplaced=unplaced, violations=validate(room, placements, items_by_id))
+
+
+def layout_csv(response: LayoutResponse) -> str:
+    """One row per requested item: its placement, or status 'unplaced'."""
+    out = io.StringIO()
+    writer = csv.writer(out, lineterminator="\n")
+    writer.writerow(["item_id", "status", "x", "z", "rotation"])
+    for p in response.placements:
+        writer.writerow([p.item_id, "placed", p.x, p.z, p.rotation])
+    for item_id in response.unplaced:
+        writer.writerow([item_id, "unplaced", "", "", ""])
+    return out.getvalue()
