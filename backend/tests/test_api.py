@@ -49,3 +49,11 @@ def test_project_save_and_load():
     loaded = client.get(f"/api/projects/{pid}").json()
     assert loaded["name"] == project["name"] and loaded["placements"][0]["item_id"] == "tv-ash"
     assert client.get("/api/projects/missing").status_code == 404
+
+
+def test_layout_csv_export():
+    res = client.post("/api/layout/csv", json={"room": ROOM, "item_ids": ["nope"]})
+    assert res.status_code == 200
+    assert res.headers["content-type"].startswith("text/csv")
+    assert "layout_run.csv" in res.headers["content-disposition"]
+    assert res.text.splitlines() == ["item_id,status,x,z,rotation", "nope,unplaced,,,"]
