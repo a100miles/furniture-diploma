@@ -7,12 +7,12 @@ Docs: http://localhost:8000/docs
 import os
 import uuid
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import catalog
 from .geometry import validate
-from .layout import auto_layout
+from .layout import auto_layout, layout_csv
 from .models import (
     FurnitureItem,
     LayoutRequest,
@@ -75,6 +75,15 @@ def recommendations(request: RecommendationRequest) -> RecommendationResponse:
 @app.post("/api/layout", response_model=LayoutResponse)
 def layout(request: LayoutRequest) -> LayoutResponse:
     return auto_layout(request)
+
+
+@app.post("/api/layout/csv")
+def layout_export(request: LayoutRequest) -> Response:
+    return Response(
+        layout_csv(auto_layout(request)),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="layout_run.csv"'},
+    )
 
 
 @app.post("/api/validate", response_model=list[Violation])
