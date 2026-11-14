@@ -53,9 +53,10 @@ class FurnitureItem(BaseModel):
     width: float = Field(..., gt=0)
     depth: float = Field(..., gt=0)
     height: float = Field(..., gt=0)
-    price: int = Field(..., ge=0, description="Price in KZT (demo data)")
+    price: int = Field(..., ge=0, description="Price in KZT")
     color: str = "#cccccc"
     against_wall: bool = False
+    url: str | None = Field(None, description="Product page in the store")
 
 
 class Placement(BaseModel):

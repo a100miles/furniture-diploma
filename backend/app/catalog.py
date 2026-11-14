@@ -1,21 +1,34 @@
-"""Furniture catalog. Reads the demo catalog from data/catalog.json.
+"""Furniture catalog.
+
+`CATALOG=mebel_kz` (default) reads items parsed from mebel.kz by the catalogue
+pipeline (pipeline/data/mebel_kz.json); `CATALOG=demo` reads the 25-item demo
+catalog in data/catalog.json, which the tests use.
 
 Replaced by a PostgreSQL repository in DIP-17; callers only use these functions.
 """
 
 import json
+import os
 from functools import lru_cache
 from pathlib import Path
 
 from .models import FurnitureItem, Style
+from .store_catalog import to_furniture_item
 
 CATALOG_PATH = Path(__file__).resolve().parent.parent / "data" / "catalog.json"
+STORE_DATA_DIR = Path(__file__).resolve().parents[2] / "pipeline" / "data"
 
 
 @lru_cache
 def load_catalog() -> dict[str, FurnitureItem]:
-    raw = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
-    return {entry["id"]: FurnitureItem(**entry) for entry in raw}
+    source = os.getenv("CATALOG", "mebel_kz")
+    if source == "demo":
+        raw = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
+        items = [FurnitureItem(**entry) for entry in raw]
+    else:
+        raw = json.loads((STORE_DATA_DIR / f"{source}.json").read_text(encoding="utf-8"))
+        items = [to_furniture_item(row) for row in raw]
+    return {item.id: item for item in items}
 
 
 def get_item(item_id: str) -> FurnitureItem | None:
