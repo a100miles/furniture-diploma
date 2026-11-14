@@ -28,6 +28,7 @@ export interface FurnitureItem {
   price: number;
   color: string;
   against_wall: boolean;
+  url?: string | null;
 }
 
 export interface Placement {

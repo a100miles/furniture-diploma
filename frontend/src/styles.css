@@ -45,7 +45,10 @@ button.primary { background: var(--accent); color: #fff; border-color: var(--acc
 .reasons { margin: 6px 0; padding-left: 18px; font-size: 12px; color: var(--muted); }
 .card-foot { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
 .swatch { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,.15); flex: none; }
+.panel input[type="search"] { margin-top: 6px; }
+.panel input[type="search"] + small { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
 .catalog { list-style: none; padding: 0; margin: 8px 0 0; }
+.catalog a { color: inherit; }
 .catalog li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 .catalog small { display: block; color: var(--muted); font-size: 11px; }
 .grow { flex: 1; }
